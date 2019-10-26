@@ -162,7 +162,7 @@ namespace LogSearcher.ViewModels
                 SourceDirectory sourceDir = new SourceDirectory(InputSourceFolder);
                 sourceDirectories.Add(sourceDir);
 
-                InputSourceFolder = "";
+                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
             }
         }
 

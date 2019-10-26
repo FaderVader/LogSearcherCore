@@ -39,16 +39,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Row 1-->
+        <!-- Input Search Text-->
         <TextBlock Grid.Row="1" Grid.Column="1">Find in file:</TextBlock>
-        <TextBox x:Name="InputSearchString" 
-                 Text ="{Binding Path=InputSearchString}"
+        <TextBox Text ="{Binding Path=InputSearchString}"
                  Grid.Row="1" 
                  Grid.Column="2" 
                  Grid.ColumnSpan="3"
                  Margin="0 0 0 5"/>
 
-        <!-- Row 2 -->
+        <!-- Input filename/extension -->
         <TextBlock Grid.Row="2" Grid.Column="1"
                    >Filename:</TextBlock>
         <TextBlock Grid.Row="2" Grid.Column="4"
@@ -56,93 +55,87 @@
                    HorizontalAlignment="Right"
                    Margin="0 0 0 10"
                    >(use * or ?)</TextBlock>
-        <TextBox x:Name="InputExtension" 
-                 Text="{Binding Path=InputExtension}"
+        <TextBox Text="{Binding Path=InputExtension}"
                  Grid.Row="2" 
                  Grid.Column="2" 
                  Grid.ColumnSpan="3"
                  Margin="0 0 0 25"
                  MinWidth="200"/>
 
-        <!-- Row 3 -->
+        <!-- Input folders to search -->
         <TextBlock Grid.Row="3" Grid.Column="1"
                    >Source folder:</TextBlock>
-        <TextBox x:Name="InputSourceFolder" 
-                 Text="{Binding Path=InputSourceFolder}"
+        <TextBox Text="{Binding Path=InputSourceFolder}"
                  Grid.Row="3" Grid.Column="2"                  
                    Grid.ColumnSpan="3"/>
-        <Button x:Name="FolderBrowse"
-                Command="{Binding FolderBrowseButton}"
+        <Button Command="{Binding FolderBrowseButton}"
                 Grid.Column="5" Grid.Row="3"
                 Margin="5 0 10 0"
                 MinWidth="20"
                 HorizontalAlignment="Left"
                 >...</Button>
-        <Button x:Name="SubmitSourceFolder" 
-                Command="{Binding SubmitSourceFolderButton}"
+        <Button Command="{Binding SubmitSourceFolderButton}"
                 Grid.Row="4" 
                 Grid.Column="4"
                 HorizontalAlignment="Right"                
                 Margin="5 5 0 10">Add</Button>
 
 
-        <!-- Row 4 -->
+        <!-- Search-folders, heading -->
         <TextBlock Grid.Row="4" 
                    Grid.Column="1" 
                    Grid.ColumnSpan="2"
                    Margin="0 20 0 0">List of source folders:</TextBlock>
 
-        <!-- Row 5 -->
-        <ListView x:Name="SourceDirectories" Grid.Row="5" Grid.Column="1" 
-                  ItemsSource="{Binding SourceDirectories}"
+        <!-- Show folders to search -->
+        <ListView ItemsSource="{Binding SourceDirectories}"
                   DisplayMemberPath="DirectoryName"
+                  Grid.Row="5" Grid.Column="1"
                   Grid.ColumnSpan="5"
                   Margin="0 0 10 0"
                   MinHeight="100"     
                   ></ListView>
 
-        <!-- Row 6 -->
-        <Button x:Name="ResetSourceFolderDisplay" 
+        <!-- Reset list of search-folders -->
+        <Button Command="{Binding ResetSourceFolderDisplayButton}"
                 Grid.Row="6" Grid.Column="4"
-                Command="{Binding ResetSourceFolderDisplayButton}"
                 Margin="0 10 10 10"
                 Grid.ColumnSpan="2"
                 HorizontalAlignment="Right"
                 MaxHeight="20"
                 >Reset</Button>
 
-        <!-- Row 7 -->
+        <!-- Copy files to folder -->
         <TextBlock Grid.Row="7" Grid.Column="1"
                    Margin="0 10 0 0"
                    >Target folder:</TextBlock>
-        <TextBox x:Name="InputTargetFolder" 
-                 Grid.Row="7" 
+        <TextBox Grid.Row="7" 
                  Grid.Column="2"
                  Grid.ColumnSpan="3"
                  Margin="0 10 0 0"
                  IsEnabled="False"></TextBox>
-        <Button x:Name="SubmitTargetFolder" 
-                Grid.Row="7" Grid.Column="5"
+        <Button Grid.Row="7" Grid.Column="5"
                 IsEnabled="False"
                 Margin="5 10 10 0">Set</Button>
 
-        <!-- Row 9 -->
-        <!-- <Button x:Name="StartSearch" -->
-        <Button x:Name="Search" 
+        <!-- Execute search -->
+        <Button Command="{Binding GoSearch}"
                 Grid.Row="9" 
                 Grid.Column="2"
                 Grid.ColumnSpan="2"
-                Background="Green"
-                Command="{Binding GoSearch}"
+                Background="Green"                
                 Margin="0 20 0 20">SEARCH</Button>
 
 
 
-        <!-- Found files-->
-        <TextBlock Grid.Row="1" 
+        <!-- Display list of found files-->
+        <TextBlock Text="{Binding SearchStatus}"
+                   Grid.Row="1"
                    Grid.Column="6"
-                   Text="{Binding SearchStatus}"></TextBlock>
-        <ListView x:Name="HitList"
+                   ></TextBlock>
+        <ListView ItemsSource="{Binding HitList}"
+                  DisplayMemberPath="FileName"                                  
+                  SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
                   Grid.Row="2" 
                   Grid.Column="6"
                   Grid.RowSpan="6" 
@@ -152,13 +145,10 @@
                   MinWidth="180"
                   MaxHeight="215"
                   MinHeight="200"
-                  
-                  ItemsSource="{Binding HitList}"
-                  DisplayMemberPath="FileName"                                  
-                  SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
                   />
-        <TextBox x:Name="FileContent" Grid.Row="7" Grid.Column="6"
-                 Text="{Binding FileContent}"
+        <TextBox Text="{Binding FileContent}"
+                 Grid.Row="7" 
+                 Grid.Column="6"                 
                  Grid.ColumnSpan="2"                    
                  Margin="0 10 10 0"></TextBox>
 
@@ -166,17 +156,15 @@
         <StackPanel Grid.Row="6" Grid.Column="6"    
                     Orientation="Horizontal"
                     Margin="0 0 0 0">
-            <Button x:Name="OpenFile" 
-                    Command="{Binding OpenFileButton}"
-                Margin="0 20 20 20 "
-                MaxWidth="70"
-                HorizontalAlignment="Left"
-                >Open File</Button>
+            <Button Command="{Binding OpenFileButton}"
+                    Margin="0 20 20 20 "
+                    MaxWidth="70"
+                    HorizontalAlignment="Left"
+                    >Open File</Button>
             <TextBlock Margin="0 23 5 0">
-            Use Notepad++:
+                    Use Notepad++:
             </TextBlock>
-            <CheckBox x:Name="SelectUseNPP"
-                      IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"
+            <CheckBox IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"
                       Margin="0 23 5 0"></CheckBox>
         </StackPanel>
 

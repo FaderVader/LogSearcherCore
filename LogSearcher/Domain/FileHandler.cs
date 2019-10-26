@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-//using System.Windows.Forms;
+using System.Windows.Forms;
 
 namespace LogSearcher.Domain
 {
@@ -12,24 +12,27 @@ namespace LogSearcher.Domain
         {
             if (!File.Exists(file?.FilePathAndName)) return;
 
-            Process.Start(file.FilePathAndName);
+            var startInfo = new ProcessStartInfo(file.FilePathAndName) { UseShellExecute = true };
+            using (var p = new Process())
+            {                
+                p.StartInfo = startInfo;
+                p.Start();
+            }
         }
 
         public static string BrowseForFolder()
-        {
-            // TODO: find dialog-alternative in Core3.0
-            //OpenFileDialog fileDialog = new OpenFileDialog();
-            //fileDialog.Multiselect = false;
-            //string selectedFolder = null;
+        {        
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Multiselect = false;
+            string selectedFolder = null;
 
-            //DialogResult result = fileDialog.ShowDialog();
-            //if (result == DialogResult.OK)
-            //{
-            //    var fileName = fileDialog.FileName;
-            //    selectedFolder = new FileInfo(fileName)?.Directory.ToString();
-            //}
-            //return selectedFolder;
-            return "";
+            DialogResult result = fileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                var fileName = fileDialog.FileName;
+                selectedFolder = new FileInfo(fileName)?.Directory.ToString();
+            }
+            return selectedFolder;
         }
 
         public static void SendToNotePadPP(HitFile hitfile)
