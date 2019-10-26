@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LogSearcher.Domain;
+using System;
 using static LogSearcher.Domain.Utils;
 
 namespace LogSearcher.Models

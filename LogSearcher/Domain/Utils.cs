@@ -14,7 +14,8 @@ namespace LogSearcher.Domain
     {
         public static bool ValidateDirectory(string path)
         {
-            if (path == null) return false; 
+            if (path == null) return false;
+            if (path == "") return false;
 
             DirectoryInfo DirInfo = new DirectoryInfo(path);
             if (DirInfo.Exists == false) return false;

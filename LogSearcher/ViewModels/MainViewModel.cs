@@ -11,6 +11,8 @@ namespace LogSearcher.ViewModels
 {
     class MainViewModel : ObservableObject
     {
+
+
         public MainViewModel()
         {
             SourceDirectories = new ObservableCollection<SourceDirectory>();
@@ -21,10 +23,24 @@ namespace LogSearcher.ViewModels
             SearchStatus = ""; // Found Files:
 
             SelectUseNPP = true; //Properties.Settings.Default.UseNPP; // UI reflects config-setting
+
+            // wire-up buttons
             GoSearch = new RelayCommand(StartSearch);
+            FolderBrowseButton = new RelayCommand(FolderBrowse);
+            SubmitSourceFolderButton = new RelayCommand(SubmitSourceFolder);
+            ResetSourceFolderDisplayButton = new RelayCommand(ResetSourceFolderDisplay);
+            SubmitTargetFolderButton = new RelayCommand(SubmitTargetFolder);
+            OpenFileButton = new RelayCommand(OpenFile);
         }
 
+        #region RelayCommands
         public RelayCommand GoSearch { get; }
+        public RelayCommand FolderBrowseButton { get; }
+        public RelayCommand SubmitSourceFolderButton { get; }
+        public RelayCommand ResetSourceFolderDisplayButton { get; }
+        public RelayCommand SubmitTargetFolderButton { get; }
+        public RelayCommand OpenFileButton { get; }
+        #endregion
 
         #region Main lists
 
@@ -55,8 +71,7 @@ namespace LogSearcher.ViewModels
             set { OnPropertyChanged(ref hitList, value); }
         }
         #endregion
-
-
+        
         #region View-property bindings 
 
         private bool selectUseNPP;
@@ -126,9 +141,8 @@ namespace LogSearcher.ViewModels
 
 
         #endregion
-
-
-        #region Buttons
+        
+        #region Button-methods
 
         public void FolderBrowse()
         {
@@ -140,8 +154,7 @@ namespace LogSearcher.ViewModels
                 SourceDirectories.Add(sourceDir);
             }
         }
-
-
+        
         public void SubmitSourceFolder()
         {
             if (Utils.ValidateDirectory(InputSourceFolder))
@@ -185,8 +198,7 @@ namespace LogSearcher.ViewModels
             FileHandler.OpenWithFile(SelectedFile);
         }
         #endregion
-
-
+        
         #region Methods
         public async Task SearchForFiles()
         {
