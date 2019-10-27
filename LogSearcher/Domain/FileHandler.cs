@@ -1,5 +1,6 @@
 ﻿using LogSearcher.Models;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
@@ -8,18 +9,12 @@ namespace LogSearcher.Domain
 {
     public static class FileHandler  // Copy the specified files to the specified location
     {
-        public static void OpenWithFile(HitFile file)
+        public static async void CopyHits(List<HitFile> hitList)
         {
-            if (!File.Exists(file?.FilePathAndName)) return;
-
-            var startInfo = new ProcessStartInfo(file.FilePathAndName) { UseShellExecute = true };
-            using (var p = new Process())
-            {                
-                p.StartInfo = startInfo;
-                p.Start();
-            }
+            // copy all files in list-parameter
+            // flag files as copied when done (change color in Found List?)
+            // allow to copy single file, selection or all (overwrite @ destination ?)
         }
-
         public static string BrowseForFolder()
         {        
             OpenFileDialog fileDialog = new OpenFileDialog();
@@ -35,25 +30,42 @@ namespace LogSearcher.Domain
             return selectedFolder;
         }
 
-        public static void SendToNotePadPP(HitFile hitfile)
+        public static void SendToNotePadPP(HitFile hitFile)
         {
-            if (hitfile == null) return;
+            if (hitFile == null) return;
+            if (!File.Exists(hitFile?.FilePathAndName)) return;
 
             try
             {
-                var notePadPath = @"C:\Program Files (x86)\Notepad++"; // TODO: where to store settings ? //Properties.Settings.Default.NotePadPP_Path;
-                var notePadExe = @"notepad++"; //Properties.Settings.Default.NotePadPP_Exe;
-                string npp = $"{notePadPath}\\{notePadExe}";
-                string args = $"-n{hitfile?.SearchPosition.Line} -c{hitfile?.SearchPosition.Column} {hitfile?.FilePathAndName}";
+                var notePadPath = AppSettings.NotePadPP_Path; 
+                var notePadExe = AppSettings.NotePadPP_Exe; 
 
-                Process.Start(npp, args);
+                var startInfo = new ProcessStartInfo(hitFile.FilePathAndName) { UseShellExecute = false };
+                startInfo.FileName = $"{notePadPath}\\{notePadExe}";
+                startInfo.Arguments = $"-n{hitFile?.SearchPosition.Line} -c{hitFile?.SearchPosition.Column} {hitFile?.FilePathAndName}";
+                using (var p = new Process())
+                {
+                    p.StartInfo = startInfo;
+                    p.Start();
+                }
             }
             catch (Exception)
-            {
-                // fallback to default application for file.
-                OpenWithFile(hitfile);
+            {               
+                OpenWithFile(hitFile);  // fallback to default application for file.
             }
 
+        }
+
+        public static void OpenWithFile(HitFile hitFile)
+        {
+            if (!File.Exists(hitFile?.FilePathAndName)) return;
+
+            var startInfo = new ProcessStartInfo(hitFile.FilePathAndName) { UseShellExecute = true };
+            using (var p = new Process())
+            {                
+                p.StartInfo = startInfo;
+                p.Start();
+            }
         }
     }
 }

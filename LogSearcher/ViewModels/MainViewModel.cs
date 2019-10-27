@@ -1,18 +1,12 @@
 ﻿using LogSearcher.Domain;
 using LogSearcher.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Threading.Tasks;
-using static LogSearcher.Domain.Utils;
 
 namespace LogSearcher.ViewModels
 {
     class MainViewModel : ObservableObject
     {
-
-
         public MainViewModel()
         {
             SourceDirectories = new ObservableCollection<SourceDirectory>();
@@ -20,9 +14,10 @@ namespace LogSearcher.ViewModels
 
             InputExtension = "";
             InputSearchString = "";
-            SearchStatus = ""; // Found Files:
+            SearchStatus = ""; 
 
-            SelectUseNPP = true; //Properties.Settings.Default.UseNPP; // UI reflects config-setting
+            AppSettings.Acquire();
+            SelectUseNPP = AppSettings.UseNPP; 
 
             // wire-up buttons
             GoSearch = new RelayCommand(StartSearch);
@@ -184,12 +179,18 @@ namespace LogSearcher.ViewModels
             SearchStatus = "Searching...";
             HitList.Clear();
             await SearchForFiles();
+
+            if (HitList.Count < 1)
+            {
+                SearchStatus = "No files found!";
+                return;
+            }
             SearchStatus = "Found Files:";
         }
 
         public void OpenFile()
         {
-            var useNPP = SelectUseNPP;    //Properties.Settings.Default.UseNPP;
+            var useNPP = SelectUseNPP;  
             if (useNPP)
             {
                 FileHandler.SendToNotePadPP(SelectedFile);

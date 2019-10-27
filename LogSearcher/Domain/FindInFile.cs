@@ -15,10 +15,9 @@ namespace LogSearcher.Domain
         public List<HitFile> HitList
         {
             get { return hitList; }
-            set { hitList = value; }
+            private set { hitList = value; }
         }
-
-
+        
         public FindInFile(SearchProfile profile)
         {
             this.searchProfile = profile;
@@ -58,9 +57,10 @@ namespace LogSearcher.Domain
             // traverse this array until match is found
             // return index (offset+1 because arrayindex->linenumber)
 
-            TextPosition position = new TextPosition(); ;
-            var lines = file.Split('\n');
-            
+            TextPosition position = new TextPosition();
+            var delim = Environment.NewLine;
+            var lines = file.Split(delim); 
+
             for (int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].Contains(searchProfile.SearchString))
