@@ -1,5 +1,6 @@
 ﻿using LogSearcher.Domain;
 using LogSearcher.Models;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -25,8 +26,11 @@ namespace LogSearcher.ViewModels
             SubmitSourceFolderButton = new RelayCommand(SubmitSourceFolder);
             ResetSourceFolderDisplayButton = new RelayCommand(ResetSourceFolderDisplay);
             SubmitTargetFolderButton = new RelayCommand(SubmitTargetFolder);
+            CopyAllButton = new RelayCommand(CopyFiles);
+            CopySelectedButton = new Command(param => { CopySelected(param); });
             OpenFileButton = new RelayCommand(OpenFile);
         }
+
 
         #region RelayCommands
         public RelayCommand GoSearch { get; }
@@ -34,6 +38,8 @@ namespace LogSearcher.ViewModels
         public RelayCommand SubmitSourceFolderButton { get; }
         public RelayCommand ResetSourceFolderDisplayButton { get; }
         public RelayCommand SubmitTargetFolderButton { get; }
+        public RelayCommand CopyAllButton { get; }
+        public Command CopySelectedButton { get; }
         public RelayCommand OpenFileButton { get; }
         #endregion
 
@@ -186,6 +192,16 @@ namespace LogSearcher.ViewModels
                 return;
             }
             SearchStatus = "Found Files:";
+        }
+
+        public async void CopyFiles()
+        {
+            await FileHandler.CopyHits(HitList, InputTargetFolder);
+        }
+
+        public async void CopySelected(object param)
+        {
+            // convert object / list of object to List<HitFiles>
         }
 
         public void OpenFile()

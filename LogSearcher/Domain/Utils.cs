@@ -38,13 +38,30 @@ namespace LogSearcher.Domain
         public string Text = "";
     }
 
+    public class Command : ICommand
+    {
+        private readonly Action<object> _action;
+        public event EventHandler CanExecuteChanged { add { } remove { } }
+
+        public Command(Action<object> action)
+        {
+            _action = action;
+        }
+
+        public bool CanExecute(object parameter) => true;
+
+        public void Execute(object parameter)
+        {
+            _action?.Invoke(parameter);
+        }
+    }
+
     public class RelayCommand : ICommand
     {
         readonly Action _execute;
         readonly Func<bool> _canExecute;
 
-
-        public RelayCommand(Action execute, Func<bool> canExecute)
+        public RelayCommand(Action execute, Func<bool> canExecute) //RelayCommand(Action execute, 
         {
             if (execute == null)
             {
@@ -55,7 +72,7 @@ namespace LogSearcher.Domain
             _canExecute = canExecute;
         }
 
-        public RelayCommand(Action execute) : this(execute, null)
+        public RelayCommand(Action execute) : this(execute, null) //RelayCommand(Action execute, 
         {
             // this overloaded constructor basically just calls the standard constructor while setting the predicate-parameter to null
         }
@@ -73,7 +90,7 @@ namespace LogSearcher.Domain
 
         public void Execute(object parameter)
         {
-            _execute.Invoke();
+            _execute.Invoke(); //_execute.Invoke();
         }
     }
 

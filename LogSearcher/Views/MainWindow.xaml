@@ -109,11 +109,12 @@
         <TextBlock Grid.Row="7" Grid.Column="1"
                    Margin="0 10 0 0"
                    >Target folder:</TextBlock>
-        <TextBox Grid.Row="7" 
+        <TextBox Text="{Binding Path=InputTargetFolder}"
+                 Grid.Row="7" 
                  Grid.Column="2"
                  Grid.ColumnSpan="3"
                  Margin="0 10 0 0"
-                 IsEnabled="False"></TextBox>
+                 ></TextBox>
         <Button Grid.Row="7" Grid.Column="5"
                 IsEnabled="False"
                 Margin="5 10 10 0">Set</Button>
@@ -133,9 +134,11 @@
                    Grid.Row="1"
                    Grid.Column="6"
                    ></TextBlock>
-        <ListView ItemsSource="{Binding HitList}"
+        <ListView x:Name="FoundFiles"
+                  ItemsSource="{Binding HitList}"
                   DisplayMemberPath="FileName"                                  
                   SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
+                  SelectionMode="Extended"
                   Grid.Row="2" 
                   Grid.Column="6"
                   Grid.RowSpan="6" 
@@ -165,7 +168,16 @@
                     Use Notepad++:
             </TextBlock>
             <CheckBox IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"
-                      Margin="0 23 5 0"></CheckBox>
+                      Margin="0 23 5 0">                
+            </CheckBox>
+            <Button Command="{Binding Path=CopyAllButton}"
+                    Margin="20 23 5 20"
+                    >Copy All</Button>
+            <Button Command="{Binding Path=CopySelectedButton}"
+                    CommandParameter="{Binding ElementName=FoundFiles, Path=SelectedItems}"
+                Margin="20 23 5 20"
+                >Copy Selected</Button>
+                    
         </StackPanel>
 
     </Grid>

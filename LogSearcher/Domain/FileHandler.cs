@@ -1,19 +1,48 @@
 ﻿using LogSearcher.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LogSearcher.Domain
 {
     public static class FileHandler  // Copy the specified files to the specified location
     {
-        public static async void CopyHits(List<HitFile> hitList)
+        public static async Task CopyHits(ObservableCollection<HitFile> hitList, string destination)
         {
             // copy all files in list-parameter
             // flag files as copied when done (change color in Found List?)
             // allow to copy single file, selection or all (overwrite @ destination ?)
+
+            if (hitList == null) return;
+            if (hitList.Count < 1) return;
+            if (destination == null) return;
+            if (destination.Length < 1) return;
+
+            if (!Directory.Exists(destination)) return;
+
+            try
+            {
+                foreach (var hit in hitList)
+                {
+                    using (FileStream sourceStream = File.Open(hit.FilePathAndName, FileMode.Open))
+                    {
+                        var newFile = Path.Combine(destination, hit.FileName);
+                        using (FileStream destinationStream = File.Create(newFile))
+                        {
+                            await sourceStream.CopyToAsync(destinationStream);
+                            hit.FileIsCopied = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to Copy Files:{Environment.NewLine}{ex.Message}", "Error on Copy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         public static string BrowseForFolder()
         {        
