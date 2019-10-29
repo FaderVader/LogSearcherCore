@@ -171,11 +171,13 @@
                       Margin="0 23 5 0">                
             </CheckBox>
             <Button Command="{Binding Path=CopyAllButton}"
+                    
                     Margin="20 23 5 20"
                     >Copy All</Button>
             <Button Command="{Binding Path=CopySelectedButton}"
                     CommandParameter="{Binding ElementName=FoundFiles, Path=SelectedItems}"
-                Margin="20 23 5 20"
+                   
+                    Margin="20 23 5 20"
                 >Copy Selected</Button>
                     
         </StackPanel>

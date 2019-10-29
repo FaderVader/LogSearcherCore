@@ -1,41 +1,84 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace LogSearcher.Domain
+namespace LogSearcher.Utils
 {
-    public static class Utils
+
+
+    public abstract class BaseCommand : ICommand
     {
-        public static bool ValidateDirectory(string path)
+        private readonly Action<object> execute;
+        readonly Func<bool> canExecute;
+
+        public event EventHandler CanExecuteChanged;
+        //{
+        //    add { CommandManager.RequerySuggested += value; }
+        //    remove { CommandManager.RequerySuggested -= value; }
+        //}
+
+        public bool CanExecute(object parameter)
         {
-            if (path == null) return false;
-            if (path == "") return false;
-
-            DirectoryInfo DirInfo = new DirectoryInfo(path);
-            if (DirInfo.Exists == false) return false;
-            return true;
+            return canExecute == null ? true : canExecute();
         }
 
-        public static DirectoryInfo GetDirInfo(this string path)
-        {            
-            DirectoryInfo DirInfo = new DirectoryInfo(path);
-            if (DirInfo.Exists == false) return null; 
-            return DirInfo;
+        public void RaiseCanExecuteChanged()
+        {
+            if (CanExecuteChanged != null)
+            {
+                CanExecuteChanged(this, EventArgs.Empty);
+            }
         }
 
+        public virtual void Execute(object parameter)
+        {
+            execute?.Invoke(parameter);
+        }
     }
-    
-    public class TextPosition
+
+    public class CommandNoParams : BaseCommand
+    {        
+        readonly Func<bool> canExecute;
+        private readonly Action execute;
+
+        public CommandNoParams(Action execute, Func<bool> canExecute = null) 
+        {
+            if (execute == null)
+            {
+                throw new NullReferenceException("execute");
+            }
+
+            this.execute = execute;
+            this.canExecute = canExecute;
+        }        
+
+        public override void Execute(object parameter)
+        {
+            execute.Invoke(); 
+        }
+    }
+
+    public class CommandWithParams : BaseCommand
     {
-        public int Line;
-        public int Column;
-        public string Text = "";
+        readonly Func<bool> canExecute;
+        private readonly Action<object> execute;
+
+        public CommandWithParams(Action<object> execute, Func<bool> canExecute = null)
+        {
+            if (execute == null)
+            {
+                throw new NullReferenceException("execute");
+            }
+
+            this.execute = execute;
+            this.canExecute = canExecute;
+        }
+
+        public override void Execute(object parameter)
+        {
+            execute.Invoke(parameter);
+        }
     }
 
     public class Command : ICommand
@@ -55,6 +98,7 @@ namespace LogSearcher.Domain
             _action?.Invoke(parameter);
         }
     }
+
 
     public class RelayCommand : ICommand
     {

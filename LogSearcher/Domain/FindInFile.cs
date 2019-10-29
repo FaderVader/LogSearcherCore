@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using static LogSearcher.Domain.Utils;
+using static LogSearcher.Domain.Validate;
 
 namespace LogSearcher.Domain
 {

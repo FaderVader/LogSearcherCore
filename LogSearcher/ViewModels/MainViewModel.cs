@@ -1,5 +1,6 @@
 ﻿using LogSearcher.Domain;
 using LogSearcher.Models;
+using LogSearcher.Utils;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -10,37 +11,44 @@ namespace LogSearcher.ViewModels
     {
         public MainViewModel()
         {
+            // initialize main lists
             SourceDirectories = new ObservableCollection<SourceDirectory>();
             HitList = new ObservableCollection<HitFile>();
 
-            InputExtension = "";
-            InputSearchString = "";
-            SearchStatus = ""; 
+            // reset ui
+            InputExtension = "*txt";
+            InputSearchString = "error";
+            InputTargetFolder = @"C:\temp\test";
+            SearchStatus = "";
 
-            AppSettings.Acquire();
-            SelectUseNPP = AppSettings.UseNPP; 
+            // get settings
+            var settings = AppSettings.GetSettings();
+            SelectUseNPP = settings.UseNPP;
 
             // wire-up buttons
-            GoSearch = new RelayCommand(StartSearch);
-            FolderBrowseButton = new RelayCommand(FolderBrowse);
-            SubmitSourceFolderButton = new RelayCommand(SubmitSourceFolder);
-            ResetSourceFolderDisplayButton = new RelayCommand(ResetSourceFolderDisplay);
-            SubmitTargetFolderButton = new RelayCommand(SubmitTargetFolder);
-            CopyAllButton = new RelayCommand(CopyFiles);
-            CopySelectedButton = new Command(param => { CopySelected(param); });
-            OpenFileButton = new RelayCommand(OpenFile);
+            GoSearch = new CommandNoParams(StartSearch);
+            FolderBrowseButton = new CommandNoParams(FolderBrowse);
+            SubmitSourceFolderButton = new CommandNoParams(SubmitSourceFolder);
+            ResetSourceFolderDisplayButton = new CommandNoParams(ResetSourceFolderDisplay);
+            SubmitTargetFolderButton = new CommandNoParams(SubmitTargetFolder);
+            OpenFileButton = new CommandNoParams(OpenFile);
+            
+            CopyAllButton = new CommandNoParams(CopyFiles, EnableCopy);            
+            CopySelectedButton = new CommandWithParams(CopySelected);
+
         }
 
 
         #region RelayCommands
-        public RelayCommand GoSearch { get; }
-        public RelayCommand FolderBrowseButton { get; }
-        public RelayCommand SubmitSourceFolderButton { get; }
-        public RelayCommand ResetSourceFolderDisplayButton { get; }
-        public RelayCommand SubmitTargetFolderButton { get; }
-        public RelayCommand CopyAllButton { get; }
-        public Command CopySelectedButton { get; }
-        public RelayCommand OpenFileButton { get; }
+        public CommandNoParams GoSearch { get; }
+        public CommandNoParams FolderBrowseButton { get; }
+        public CommandNoParams SubmitSourceFolderButton { get; }
+        public CommandNoParams ResetSourceFolderDisplayButton { get; }
+        public CommandNoParams SubmitTargetFolderButton { get; }
+        public CommandNoParams CopyAllButton { get; }
+        public CommandNoParams OpenFileButton { get; }
+        public CommandWithParams CopySelectedButton { get; }
+
         #endregion
 
         #region Main lists
@@ -52,11 +60,10 @@ namespace LogSearcher.ViewModels
         {
             get { return sourceDirectories; }
             set
-            {                
-               OnPropertyChanged(ref sourceDirectories, value);
+            {
+                OnPropertyChanged(ref sourceDirectories, value);
             }
         }
-
         public TargetDirectory TargetDirectory
         {
             get { return targetDirectory; }
@@ -65,14 +72,13 @@ namespace LogSearcher.ViewModels
                 OnPropertyChanged(ref targetDirectory, value);
             }
         }
-
         public ObservableCollection<HitFile> HitList
         {
             get { return hitList; }
             set { OnPropertyChanged(ref hitList, value); }
         }
         #endregion
-        
+
         #region View-property bindings 
 
         private bool selectUseNPP;
@@ -140,25 +146,24 @@ namespace LogSearcher.ViewModels
             set { OnPropertyChanged(ref fileContent, value); }
         }
 
-
         #endregion
-        
+
         #region Button-methods
 
         public void FolderBrowse()
         {
             var folder = FileHandler.BrowseForFolder();
 
-            if (Utils.ValidateDirectory(folder))
+            if (Validate.ValidateDirectory(folder))
             {
                 SourceDirectory sourceDir = new SourceDirectory(folder);
                 SourceDirectories.Add(sourceDir);
             }
         }
-        
+
         public void SubmitSourceFolder()
         {
-            if (Utils.ValidateDirectory(InputSourceFolder))
+            if (Validate.ValidateDirectory(InputSourceFolder))
             {
                 SourceDirectory sourceDir = new SourceDirectory(InputSourceFolder);
                 sourceDirectories.Add(sourceDir);
@@ -192,6 +197,7 @@ namespace LogSearcher.ViewModels
                 return;
             }
             SearchStatus = "Found Files:";
+            CopyAllButton.RaiseCanExecuteChanged();
         }
 
         public async void CopyFiles()
@@ -206,16 +212,16 @@ namespace LogSearcher.ViewModels
 
         public void OpenFile()
         {
-            var useNPP = SelectUseNPP;  
+            var useNPP = SelectUseNPP;
             if (useNPP)
             {
-                FileHandler.SendToNotePadPP(SelectedFile);
+                FileHandler.OpenWithNPP(SelectedFile);
                 return;
             }
-            FileHandler.OpenWithFile(SelectedFile);
+            FileHandler.OpenWithDefault(SelectedFile);
         }
         #endregion
-        
+
         #region Methods
         public async Task SearchForFiles()
         {
@@ -232,6 +238,15 @@ namespace LogSearcher.ViewModels
 
             HitList = localHits;
         }
+
+        //Func<bool> EnableCopy = () => HitList.Count > 0;
+        public bool EnableCopy()
+        {
+            //var result = HitList.Count > 0 ? true : false;
+            var result = false;
+            return result;
+        }
+
         #endregion
     }
 }

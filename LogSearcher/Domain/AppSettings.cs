@@ -6,11 +6,7 @@ namespace LogSearcher.Domain
 {
     public static class AppSettings
     {
-        private static IConfiguration configuration { get; set; }
-
-        public static string NotePadPP_Path { get; private set; }
-        public static string NotePadPP_Exe { get; private set; }
-        public static bool UseNPP { get; private set; }
+        private static IConfiguration configRoot { get; set; }
 
         static AppSettings()
         {
@@ -18,17 +14,22 @@ namespace LogSearcher.Domain
                               .SetBasePath(Directory.GetCurrentDirectory())
                               .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            configuration = builder.Build();
+            configRoot = builder.Build();
+            var appSettings = configRoot.GetSection("AppSettings");
+            
         }
 
-        public static void Acquire()
+        public static Settings GetSettings()
         {
-            NotePadPP_Path = configuration.GetSection("AppSettings").GetValue<string>("NotePadPP_Path");
-            NotePadPP_Exe = configuration.GetSection("AppSettings").GetValue<string>("NotePadPP_Exe");
-
-            Boolean.TryParse(configuration.GetSection("AppSettings").GetValue<string>("UseNPP"), out bool useit);
-            UseNPP = useit;
-
+            var settings = configRoot.GetSection("AppSettings").Get<Settings>();
+            return settings;
         }
+    }
+
+    public class Settings
+    {
+        public string NotePadPP_Path { get; set; }
+        public string NotePadPP_Exe { get; set; }
+        public bool UseNPP { get; set; }
     }
 }

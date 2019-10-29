@@ -59,15 +59,15 @@ namespace LogSearcher.Domain
             return selectedFolder;
         }
 
-        public static void SendToNotePadPP(HitFile hitFile)
+        public static void OpenWithNPP(HitFile hitFile)
         {
             if (hitFile == null) return;
             if (!File.Exists(hitFile?.FilePathAndName)) return;
 
             try
             {
-                var notePadPath = AppSettings.NotePadPP_Path; 
-                var notePadExe = AppSettings.NotePadPP_Exe; 
+                var notePadPath = AppSettings.GetSettings().NotePadPP_Path; 
+                var notePadExe = AppSettings.GetSettings().NotePadPP_Exe; 
 
                 var startInfo = new ProcessStartInfo(hitFile.FilePathAndName) { UseShellExecute = false };
                 startInfo.FileName = $"{notePadPath}\\{notePadExe}";
@@ -80,12 +80,12 @@ namespace LogSearcher.Domain
             }
             catch (Exception)
             {               
-                OpenWithFile(hitFile);  // fallback to default application for file.
+                OpenWithDefault(hitFile);  // fallback to default application for file.
             }
 
         }
 
-        public static void OpenWithFile(HitFile hitFile)
+        public static void OpenWithDefault(HitFile hitFile)
         {
             if (!File.Exists(hitFile?.FilePathAndName)) return;
 

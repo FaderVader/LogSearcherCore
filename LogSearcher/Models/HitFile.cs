@@ -1,6 +1,6 @@
 ﻿using LogSearcher.Domain;
 using System;
-using static LogSearcher.Domain.Utils;
+using static LogSearcher.Domain.Validate;
 
 namespace LogSearcher.Models
 {
