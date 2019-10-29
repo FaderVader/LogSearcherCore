@@ -2,6 +2,7 @@
 using LogSearcher.Models;
 using LogSearcher.Utils;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -26,28 +27,28 @@ namespace LogSearcher.ViewModels
             SelectUseNPP = settings.UseNPP;
 
             // wire-up buttons
-            GoSearch = new CommandNoParams(StartSearch);
-            FolderBrowseButton = new CommandNoParams(FolderBrowse);
-            SubmitSourceFolderButton = new CommandNoParams(SubmitSourceFolder);
-            ResetSourceFolderDisplayButton = new CommandNoParams(ResetSourceFolderDisplay);
-            SubmitTargetFolderButton = new CommandNoParams(SubmitTargetFolder);
-            OpenFileButton = new CommandNoParams(OpenFile);
+            GoSearch = new RelayCommandNoParams(StartSearch);
+            FolderBrowseButton = new RelayCommandNoParams(FolderBrowse);
+            SubmitSourceFolderButton = new RelayCommandNoParams(SubmitSourceFolder);
+            ResetSourceFolderDisplayButton = new RelayCommandNoParams(ResetSourceFolderDisplay);
+            SubmitTargetFolderButton = new RelayCommandNoParams(SubmitTargetFolder);
+            OpenFileButton = new RelayCommandNoParams(OpenFile);
             
-            CopyAllButton = new CommandNoParams(CopyFiles, EnableCopy);            
-            CopySelectedButton = new CommandWithParams(CopySelected);
+            CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);            
+            CopySelectedButton = new RelayCommandWithParams(CopySelected, EnableCopySelected);
 
         }
 
 
         #region RelayCommands
-        public CommandNoParams GoSearch { get; }
-        public CommandNoParams FolderBrowseButton { get; }
-        public CommandNoParams SubmitSourceFolderButton { get; }
-        public CommandNoParams ResetSourceFolderDisplayButton { get; }
-        public CommandNoParams SubmitTargetFolderButton { get; }
-        public CommandNoParams CopyAllButton { get; }
-        public CommandNoParams OpenFileButton { get; }
-        public CommandWithParams CopySelectedButton { get; }
+        public RelayCommandNoParams GoSearch { get; }
+        public RelayCommandNoParams FolderBrowseButton { get; }
+        public RelayCommandNoParams SubmitSourceFolderButton { get; }
+        public RelayCommandNoParams ResetSourceFolderDisplayButton { get; }
+        public RelayCommandNoParams SubmitTargetFolderButton { get; }
+        public RelayCommandNoParams CopyAllButton { get; }
+        public RelayCommandNoParams OpenFileButton { get; }
+        public RelayCommandWithParams CopySelectedButton { get; }
 
         #endregion
 
@@ -196,18 +197,24 @@ namespace LogSearcher.ViewModels
                 SearchStatus = "No files found!";
                 return;
             }
-            SearchStatus = "Found Files:";
-            CopyAllButton.RaiseCanExecuteChanged();
+            SearchStatus = "Found Files:";            
         }
 
-        public async void CopyFiles()
+        public async void CopyAllFiles()
         {
             await FileHandler.CopyHits(HitList, InputTargetFolder);
         }
 
-        public async void CopySelected(object param)
-        {
-            // convert object / list of object to List<HitFiles>
+        public async void CopySelected(object elements)
+        {            
+            IEnumerable<object> objList = (IEnumerable<object>)elements; // convert object to list
+            
+            ObservableCollection<HitFile> hitList = new ObservableCollection<HitFile>();
+            foreach (var obj in objList)
+            {
+                hitList.Add(obj as HitFile);
+            }
+            await FileHandler.CopyHits(hitList, InputTargetFolder);
         }
 
         public void OpenFile()
@@ -237,14 +244,18 @@ namespace LogSearcher.ViewModels
             }
 
             HitList = localHits;
+        }        
+
+        public bool EnableCopyAll()
+        {
+            var result = HitList.Count > 0 ? true : false;
+            return result;
         }
 
-        //Func<bool> EnableCopy = () => HitList.Count > 0;
-        public bool EnableCopy()
+        public bool EnableCopySelected()
         {
-            //var result = HitList.Count > 0 ? true : false;
-            var result = false;
-            return result;
+            var check = SelectedFile != null ? true : false;
+            return check;
         }
 
         #endregion
