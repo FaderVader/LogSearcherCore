@@ -20,6 +20,7 @@ namespace LogSearcher.ViewModels
             InputExtension = "*txt";
             InputSearchString = "error";
             InputTargetFolder = @"C:\temp\test";
+            InputSourceFolder = @"C:\temp\LogSearcherTestFiles\VCP_logs";
             SearchStatus = "";
 
             // get settings
@@ -206,9 +207,9 @@ namespace LogSearcher.ViewModels
         }
 
         public async void CopySelected(object elements)
-        {            
-            IEnumerable<object> objList = (IEnumerable<object>)elements; // convert object to list
-            
+        {
+            var objList = (IEnumerable<object>)elements; // convert object to list
+
             ObservableCollection<HitFile> hitList = new ObservableCollection<HitFile>();
             foreach (var obj in objList)
             {

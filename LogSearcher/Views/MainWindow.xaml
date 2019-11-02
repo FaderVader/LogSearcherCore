@@ -6,8 +6,18 @@
         xmlns:viewmodels="clr-namespace:LogSearcher.ViewModels"
         xmlns:local="clr-namespace:LogSearcher"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-
+        Background="Gray"
+        Title="LogSearcher" Height="450" Width="800">
+    
+    <Window.Resources>
+        <DataTemplate x:Key="FoundFilesView">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="Selected"/>
+                <TextBlock Text="{Binding FileName}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    
     <Window.DataContext>
         <viewmodels:MainViewModel/>
     </Window.DataContext>
@@ -135,8 +145,8 @@
                    Grid.Column="6"
                    ></TextBlock>
         <ListView x:Name="FoundFiles"
-                  ItemsSource="{Binding HitList}"
-                  DisplayMemberPath="FileName"                                  
+                  ItemsSource="{Binding HitList}"                   
+                  ItemTemplate="{StaticResource FoundFilesView}"
                   SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
                   SelectionMode="Extended"
                   Grid.Row="2" 
@@ -149,6 +159,7 @@
                   MaxHeight="215"
                   MinHeight="200"
                   />
+        <!--DisplayMemberPath="FileName" -->
         <TextBox Text="{Binding FileContent}"
                  Grid.Row="7" 
                  Grid.Column="6"                 
