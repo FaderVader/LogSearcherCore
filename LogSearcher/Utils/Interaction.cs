@@ -21,7 +21,7 @@ namespace LogSearcher.Utils
         {
             if (execute == null)
             {
-                throw new NullReferenceException("execute");
+                throw new NullReferenceException("No action provided to execute.");
             }
 
             this.execute = execute;

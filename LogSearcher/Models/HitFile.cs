@@ -7,7 +7,6 @@ namespace LogSearcher.Models
     public class HitFile : IFoundFile
     {
         private string fileName;
-
         public string FileName
         {
             get { return fileName; }
@@ -15,7 +14,6 @@ namespace LogSearcher.Models
 
 
         private string filePath;
-
         public string FilePath
         {
             get { return filePath; }
@@ -24,26 +22,29 @@ namespace LogSearcher.Models
 
         public string FilePathAndName
         {
-
             get { return filePath + "\\" + fileName; }
         }
 
         private bool fileIsCopied;
-
         public bool FileIsCopied
         {
             get { return fileIsCopied; }
             set { fileIsCopied = value; }
         }
 
+        private bool marked;
+        public bool Marked
+        {
+            get { return marked; }
+            set { marked = value; }
+        }
+        
         private TextPosition searchPosition;
-
         public TextPosition SearchPosition
         {
             get { return searchPosition; }
             set { searchPosition = value; }
         }
-
 
         public HitFile(string fullPath)
         {

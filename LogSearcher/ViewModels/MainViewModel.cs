@@ -4,6 +4,7 @@ using LogSearcher.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LogSearcher.ViewModels
@@ -207,15 +208,8 @@ namespace LogSearcher.ViewModels
         }
 
         public async void CopySelected(object elements)
-        {
-            var objList = (IEnumerable<object>)elements; // convert object to list
-
-            ObservableCollection<HitFile> hitList = new ObservableCollection<HitFile>();
-            foreach (var obj in objList)
-            {
-                hitList.Add(obj as HitFile);
-            }
-            await FileHandler.CopyHits(hitList, InputTargetFolder);
+        {            
+            await CopySelectedFiles(elements);
         }
 
         public void OpenFile()
@@ -245,7 +239,32 @@ namespace LogSearcher.ViewModels
             }
 
             HitList = localHits;
-        }        
+        }    
+        
+        public async Task CopySelectedFiles(object elements)
+        {
+            var selectedFiles = new ObservableCollection<HitFile>();
+
+            // first, get selected files
+            if (elements != null)
+            {
+                var objList = (IEnumerable<object>)elements;
+                foreach (var obj in objList)
+                {
+                    selectedFiles.Add(obj as HitFile);
+                }
+            }
+
+            // then, get marked files
+            var marked = HitList.Where(hit => hit.Marked == true);
+            var markedFiles = new ObservableCollection<HitFile>(marked);
+
+            // now, join the two lists + filter out duplicates
+            var joined = selectedFiles.Concat(markedFiles).Distinct(new HitFileComparer());
+            var hitList = new ObservableCollection<HitFile>(joined);
+            
+            await FileHandler.CopyHits(selectedFiles, InputTargetFolder);
+        }
 
         public bool EnableCopyAll()
         {

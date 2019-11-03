@@ -17,11 +17,8 @@ namespace LogSearcher.Domain
             // flag files as copied when done (change color in Found List?)
             // allow to copy single file, selection or all (overwrite @ destination ?)
 
-            if (hitList == null) return;
-            if (hitList.Count < 1) return;
-            if (destination == null) return;
-            if (destination.Length < 1) return;
-
+            if (hitList == null || hitList.Count < 1) return;
+            if (destination == null || destination.Length < 1) return;
             if (!Directory.Exists(destination)) return;
 
             try
@@ -44,6 +41,7 @@ namespace LogSearcher.Domain
                 MessageBox.Show($"Failed to Copy Files:{Environment.NewLine}{ex.Message}", "Error on Copy", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        
         public static string BrowseForFolder()
         {        
             OpenFileDialog fileDialog = new OpenFileDialog();
