@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace LogSearcher.Domain
+namespace LogSearcher.Utils
 {
     public static class AppSettings
     {

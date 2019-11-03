@@ -30,10 +30,10 @@ namespace LogSearcher.ViewModels
 
             // wire-up buttons
             GoSearch = new RelayCommandNoParams(StartSearch);
-            FolderBrowseButton = new RelayCommandNoParams(FolderBrowse);
+            OpenSourceFolderButton = new RelayCommandNoParams(OpenSourceFolder);
             SubmitSourceFolderButton = new RelayCommandNoParams(SubmitSourceFolder);
             ResetSourceFolderDisplayButton = new RelayCommandNoParams(ResetSourceFolderDisplay);
-            SubmitTargetFolderButton = new RelayCommandNoParams(SubmitTargetFolder);
+            OpenTargetFolderButton = new RelayCommandNoParams(OpenTargetFolder);
             OpenFileButton = new RelayCommandNoParams(OpenFile);
             
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);            
@@ -44,10 +44,10 @@ namespace LogSearcher.ViewModels
 
         #region RelayCommands
         public RelayCommandNoParams GoSearch { get; }
-        public RelayCommandNoParams FolderBrowseButton { get; }
+        public RelayCommandNoParams OpenSourceFolderButton { get; }
         public RelayCommandNoParams SubmitSourceFolderButton { get; }
         public RelayCommandNoParams ResetSourceFolderDisplayButton { get; }
-        public RelayCommandNoParams SubmitTargetFolderButton { get; }
+        public RelayCommandNoParams OpenTargetFolderButton { get; }
         public RelayCommandNoParams CopyAllButton { get; }
         public RelayCommandNoParams OpenFileButton { get; }
         public RelayCommandWithParams CopySelectedButton { get; }
@@ -91,15 +91,13 @@ namespace LogSearcher.ViewModels
             set { OnPropertyChanged(ref selectUseNPP, value); }
         }
 
-
         private string searchStatus;
         public string SearchStatus
         {
             get { return searchStatus; }
             set { OnPropertyChanged(ref searchStatus, value); }
         }
-
-
+        
         private string inputSearchString;
         public string InputSearchString
         {
@@ -109,8 +107,7 @@ namespace LogSearcher.ViewModels
                 OnPropertyChanged(ref inputSearchString, value);
             }
         }
-
-
+        
         private string inputExtension;
         public string InputExtension
         {
@@ -128,6 +125,13 @@ namespace LogSearcher.ViewModels
             set { OnPropertyChanged(ref inputSourceFolder, value); }
         }
 
+        private SourceDirectory selectedInputSourceFolder;
+        public SourceDirectory SelectedInputSourceFolder
+        {
+            get { return selectedInputSourceFolder; }
+            set { OnPropertyChanged(ref selectedInputSourceFolder, value); InputSourceFolder = value?.DirectoryName;  }
+        }
+        
         private string inputTargetFolder;
         public string InputTargetFolder
         {
@@ -153,20 +157,24 @@ namespace LogSearcher.ViewModels
 
         #region Button-methods
 
-        public void FolderBrowse()
+        public void OpenSourceFolder()
         {
-            var folder = FileHandler.BrowseForFolder();
+            var target = InputSourceFolder.ValidateDirectory() == true ? InputSourceFolder : "";
 
-            if (Validate.ValidateDirectory(folder))
+            var folder = FileHandler.BrowseForFolder(target);
+
+            if (folder.ValidateDirectory()) //TODO: ensure duplicate entries are not allowed
             {
                 SourceDirectory sourceDir = new SourceDirectory(folder);
                 SourceDirectories.Add(sourceDir);
+
+                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
             }
         }
 
         public void SubmitSourceFolder()
         {
-            if (Validate.ValidateDirectory(InputSourceFolder))
+            if (InputSourceFolder.ValidateDirectory())  //TODO: ensure duplicate entries are not allowed
             {
                 SourceDirectory sourceDir = new SourceDirectory(InputSourceFolder);
                 sourceDirectories.Add(sourceDir);
@@ -179,13 +187,13 @@ namespace LogSearcher.ViewModels
         {
             // reset value of SourceFolderDisplay
             SourceDirectories = new ObservableCollection<SourceDirectory>();
+            HitList = new ObservableCollection<HitFile>();
         }
 
-        public void SubmitTargetFolder()
-        {
-            // grab value of TargetDirectory
-            // Not currently implemented
-            var test = InputTargetFolder;
+        public void OpenTargetFolder()
+        {            
+            var target = InputTargetFolder.ValidateDirectory() == true ? InputTargetFolder : "";
+            InputTargetFolder = FileHandler.BrowseForFolder(target);
         }
 
         public async void StartSearch()
@@ -205,6 +213,7 @@ namespace LogSearcher.ViewModels
         public async void CopyAllFiles()
         {
             await FileHandler.CopyHits(HitList, InputTargetFolder);
+            UpdateHitList();
         }
 
         public async void CopySelected(object elements)
@@ -263,20 +272,42 @@ namespace LogSearcher.ViewModels
             var joined = selectedFiles.Concat(markedFiles).Distinct(new HitFileComparer());
             var hitList = new ObservableCollection<HitFile>(joined);
             
-            await FileHandler.CopyHits(selectedFiles, InputTargetFolder);
+            await FileHandler.CopyHits(hitList, InputTargetFolder);
+
+            // update list af found files to reflect copy-state
+            UpdateHitList();
+            
+        }
+        
+        private void UpdateHitList()
+        {
+            var temp = new ObservableCollection<HitFile>();            
+
+            foreach (var hit in HitList)
+            {
+                temp.Add(hit);
+            }
+
+            HitList.Clear();
+            HitList = temp;
         }
 
         public bool EnableCopyAll()
         {
-            var result = HitList.Count > 0 ? true : false;
-            return result;
+            var foundFiles = HitList.Count > 0 ? true : false;
+            var destinationOK = inputTargetFolder.ValidateDirectory();
+
+            return foundFiles && destinationOK;
         }
 
         public bool EnableCopySelected()
         {
-            var check = SelectedFile != null ? true : false;
-            return check;
+            var selected = SelectedFile != null ? true : false;
+            var destinationOK = inputTargetFolder.ValidateDirectory();
+
+            return selected && destinationOK;
         }
+
 
         #endregion
     }

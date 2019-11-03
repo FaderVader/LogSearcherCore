@@ -1,10 +1,13 @@
 ﻿using LogSearcher.Domain;
+using LogSearcher.Utils;
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using static LogSearcher.Domain.Validate;
 
 namespace LogSearcher.Models
 {
-    public class HitFile : IFoundFile
+    public class HitFile : IFoundFile 
     {
         private string fileName;
         public string FileName
@@ -29,8 +32,8 @@ namespace LogSearcher.Models
         public bool FileIsCopied
         {
             get { return fileIsCopied; }
-            set { fileIsCopied = value; }
-        }
+            set { fileIsCopied = value; Marked = true; }  
+        }       
 
         private bool marked;
         public bool Marked

@@ -18,6 +18,14 @@
                 <TextBlock Text="{Binding FileName}"/>
             </StackPanel>
         </DataTemplate>
+
+        <Style x:Key="ListViewItems" TargetType="{x:Type ListViewItem}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=FileIsCopied}" Value="True">
+                    <Setter Property="Background" Value="Green"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Window.DataContext>
@@ -73,14 +81,14 @@
                  Grid.ColumnSpan="4"
                  Margin="0 0 10 25"
                  MinWidth="200"/>
-
+        
         <!-- Input folders to search -->
         <TextBlock Grid.Row="3" Grid.Column="1"
                    >Source folder:</TextBlock>
-        <TextBox Text="{Binding Path=InputSourceFolder}"
+        <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"
                  Grid.Row="3" Grid.Column="2"                  
-                   Grid.ColumnSpan="3"/>
-        <Button Command="{Binding FolderBrowseButton}"
+                 Grid.ColumnSpan="3"/>
+        <Button Command="{Binding OpenSourceFolderButton}"
                 Grid.Column="5" Grid.Row="3"
                 Margin="5 0 10 0"
                 MinWidth="20"
@@ -102,12 +110,13 @@
         <!-- Show folders to search -->
         <ListView ItemsSource="{Binding SourceDirectories}"
                   DisplayMemberPath="DirectoryName"
+                  SelectedItem="{Binding Path=SelectedInputSourceFolder}"                  
                   Grid.Row="5" Grid.Column="1"
                   Grid.ColumnSpan="5"
                   Margin="0 0 10 0"
                   MinHeight="100">
         </ListView>
-
+        
         <!-- Reset list of search-folders -->
         <Button Command="{Binding ResetSourceFolderDisplayButton}"
                 Grid.Row="6" Grid.Column="4"
@@ -118,6 +127,7 @@
             Reset
         </Button>
 
+        
         <!-- Copy files to folder -->
         <TextBlock Grid.Row="7" Grid.Column="1"
                    Margin="0 10 0 0">
@@ -126,12 +136,16 @@
         <TextBox Text="{Binding Path=InputTargetFolder}"
                  Grid.Row="7" 
                  Grid.Column="2"
-                 Grid.ColumnSpan="4"
-                 Margin="0 10 10 0">
+                 Grid.ColumnSpan="3"
+                 Margin="0 10 0 0">
         </TextBox>
-        <!--<Button Grid.Row="7" Grid.Column="5"
-                IsEnabled="False"
-                Margin="5 10 10 0">Set</Button>-->
+        <Button Command="{Binding OpenTargetFolderButton}"
+                Grid.Column="5" Grid.Row="7"
+                Margin="5 10 10 0"
+                MinWidth="20"
+                HorizontalAlignment="Left"
+                >...</Button>
+
 
         <!-- Execute search -->
         <Button Command="{Binding GoSearch}"
@@ -144,7 +158,6 @@
         </Button>
 
 
-
         <!-- Display list of found files-->
         <TextBlock Text="{Binding SearchStatus}"
                    Grid.Row="1"
@@ -152,6 +165,7 @@
         </TextBlock>
         <ListView x:Name="FoundFiles"
                   ItemsSource="{Binding HitList}"                   
+                  ItemContainerStyle="{StaticResource ListViewItems}"
                   ItemTemplate="{StaticResource FoundFilesView}"
                   SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
                   SelectionMode="Extended"

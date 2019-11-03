@@ -1,6 +1,6 @@
 ﻿using LogSearcher.Models;
+using LogSearcher.Utils;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -25,14 +25,17 @@ namespace LogSearcher.Domain
             {
                 foreach (var hit in hitList)
                 {
-                    using (FileStream sourceStream = File.Open(hit.FilePathAndName, FileMode.Open))
+                    if (!hit.FileIsCopied) // do not copy already processed files
                     {
-                        var newFile = Path.Combine(destination, hit.FileName);
-                        using (FileStream destinationStream = File.Create(newFile))
+                        using (FileStream sourceStream = File.Open(hit.FilePathAndName, FileMode.Open))
                         {
-                            await sourceStream.CopyToAsync(destinationStream);
-                            hit.FileIsCopied = true;
-                        }
+                            var newFile = Path.Combine(destination, hit.FileName);
+                            using (FileStream destinationStream = File.Create(newFile))
+                            {
+                                await sourceStream.CopyToAsync(destinationStream);
+                                hit.FileIsCopied = true;
+                            }
+                        } 
                     }
                 }
             }
@@ -42,11 +45,16 @@ namespace LogSearcher.Domain
             }
         }
         
-        public static string BrowseForFolder()
+        public static string BrowseForFolder(string initialDir = "")
         {        
+            string selectedFolder = null;
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Multiselect = false;
-            string selectedFolder = null;
+
+            if (!string.IsNullOrEmpty(initialDir) && initialDir.ValidateDirectory())
+            {
+                fileDialog.InitialDirectory = initialDir;
+            }
 
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK)
@@ -64,8 +72,9 @@ namespace LogSearcher.Domain
 
             try
             {
-                var notePadPath = AppSettings.GetSettings().NotePadPP_Path; 
-                var notePadExe = AppSettings.GetSettings().NotePadPP_Exe; 
+                var settings = AppSettings.GetSettings();
+                var notePadPath = settings.NotePadPP_Path; 
+                var notePadExe = settings.NotePadPP_Exe; 
 
                 var startInfo = new ProcessStartInfo(hitFile.FilePathAndName) { UseShellExecute = false };
                 startInfo.FileName = $"{notePadPath}\\{notePadExe}";

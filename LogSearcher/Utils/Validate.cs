@@ -1,17 +1,12 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+﻿using System.IO;
 
 namespace LogSearcher.Domain
 {
     public static class Validate
     {
-        public static bool ValidateDirectory(string path)
+        public static bool ValidateDirectory(this string path)
         {
-            if (path == null) return false;
-            if (path == "") return false;
+            if (string.IsNullOrEmpty(path)) return false;            
 
             DirectoryInfo DirInfo = new DirectoryInfo(path);
             if (DirInfo.Exists == false) return false;
