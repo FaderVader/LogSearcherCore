@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:LogSearcher"
         mc:Ignorable="d"
         Background="Gray"
-        Title="LogSearcher" Height="450" Width="800">
+        Title="LogSearcher" Height="500" Width="900">
 
     <Window.Resources>
         <DataTemplate x:Key="FoundFilesView">
@@ -81,7 +81,7 @@
                  Grid.ColumnSpan="4"
                  Margin="0 0 10 25"
                  MinWidth="200"/>
-        
+
         <!-- Input folders to search -->
         <TextBlock Grid.Row="3" Grid.Column="1"
                    >Source folder:</TextBlock>
@@ -94,18 +94,33 @@
                 MinWidth="20"
                 HorizontalAlignment="Left"
                 >...</Button>
-        <Button Command="{Binding SubmitSourceFolderButton}"
-                Grid.Row="4" 
-                Grid.Column="4"
-                HorizontalAlignment="Right"                
-                Margin="5 5 0 10">Add</Button>
+        <StackPanel Grid.Row="4" 
+                Grid.Column="2" 
+                Orientation="Horizontal">
+            <ComboBox x:Name="History"
+                ItemsSource="{Binding Path=DirectoryHistory}"
+                DisplayMemberPath="DirectoryName"
+                Margin="0 5 0 10"
+                MinWidth="185">
+            </ComboBox>
+            <Button Margin="15 5 0 10"
+                    Command="{Binding SetInputFromHistoryButton}"
+                    CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
+                    >Use History</Button>
+            <Button Command="{Binding SubmitSourceFolderButton}"
+                Margin="15 5 0 10">
+                Add
+            </Button>
+        </StackPanel>
+
 
 
         <!-- Search-folders, heading -->
-        <TextBlock Grid.Row="4" 
+        <TextBlock Grid.Row="6" 
                    Grid.Column="1" 
                    Grid.ColumnSpan="2"
-                   Margin="0 20 0 0">List of source folders:</TextBlock>
+                   VerticalAlignment="Top"
+                   Margin="0 0 0 0">List of source folders</TextBlock>
 
         <!-- Show folders to search -->
         <ListView ItemsSource="{Binding SourceDirectories}"
@@ -116,7 +131,7 @@
                   Margin="0 0 10 0"
                   MinHeight="100">
         </ListView>
-        
+
         <!-- Reset list of search-folders -->
         <Button Command="{Binding ResetSourceFolderDisplayButton}"
                 Grid.Row="6" Grid.Column="4"
@@ -127,7 +142,7 @@
             Reset
         </Button>
 
-        
+
         <!-- Copy files to folder -->
         <TextBlock Grid.Row="7" Grid.Column="1"
                    Margin="0 10 0 0">
@@ -179,13 +194,19 @@
                   MaxHeight="215"
                   MinHeight="200">
         </ListView>
-            <!--DisplayMemberPath="FileName" -->
-        <TextBox Text="{Binding FileContent}"
-                 Grid.Row="7" 
-                 Grid.Column="6"                 
-                 Grid.ColumnSpan="2"                    
-                 Margin="0 10 10 0">
-        </TextBox>
+        <!--DisplayMemberPath="FileName" -->
+        <StackPanel Grid.Row="7" Grid.Column="6" Grid.ColumnSpan="2" >
+            <TextBlock>1st found line:</TextBlock>
+            <TextBox Text="{Binding FileContent}" TextWrapping="Wrap"                     
+                 Margin="0 2 10 0">
+            </TextBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="8" Grid.Column="6" Grid.ColumnSpan="2" >
+            <TextBlock Margin="0 10 0 0">Path of selected file:</TextBlock>
+            <TextBox Text="{Binding SelectedFile.FilePath, Mode=OneWay}"
+                 Margin="0 2 10 0"/>
+        </StackPanel>
 
         <!--Use Notepad++ ?-->
         <StackPanel Grid.Row="6" Grid.Column="6"    

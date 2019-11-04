@@ -4,6 +4,7 @@ using LogSearcher.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace LogSearcher.ViewModels
             // initialize main lists
             SourceDirectories = new ObservableCollection<SourceDirectory>();
             HitList = new ObservableCollection<HitFile>();
+            if (directoryHistory == null) directoryHistory = new BindingList<LogDirectory>();
 
             // reset ui
             InputExtension = "*txt";
@@ -30,7 +32,7 @@ namespace LogSearcher.ViewModels
 
             // wire-up buttons
             GoSearch = new RelayCommandNoParams(StartSearch);
-            OpenSourceFolderButton = new RelayCommandNoParams(OpenSourceFolder);
+            OpenSourceFolderButton = new RelayCommandNoParams(BrowseForSourceFolder);
             SubmitSourceFolderButton = new RelayCommandNoParams(SubmitSourceFolder);
             ResetSourceFolderDisplayButton = new RelayCommandNoParams(ResetSourceFolderDisplay);
             OpenTargetFolderButton = new RelayCommandNoParams(OpenTargetFolder);
@@ -38,6 +40,7 @@ namespace LogSearcher.ViewModels
             
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);            
             CopySelectedButton = new RelayCommandWithParams(CopySelected, EnableCopySelected);
+            SetInputFromHistoryButton = new RelayCommandWithParams(SetSourceFolder);
 
         }
 
@@ -51,6 +54,7 @@ namespace LogSearcher.ViewModels
         public RelayCommandNoParams CopyAllButton { get; }
         public RelayCommandNoParams OpenFileButton { get; }
         public RelayCommandWithParams CopySelectedButton { get; }
+        public RelayCommandWithParams SetInputFromHistoryButton { get; }
 
         #endregion
 
@@ -80,6 +84,14 @@ namespace LogSearcher.ViewModels
             get { return hitList; }
             set { OnPropertyChanged(ref hitList, value); }
         }
+
+        private BindingList<LogDirectory> directoryHistory;
+        public BindingList<LogDirectory> DirectoryHistory
+        {
+            get { return directoryHistory; }
+            set { OnPropertyChanged(ref directoryHistory, value); }
+        }
+
         #endregion
 
         #region View-property bindings 
@@ -157,30 +169,23 @@ namespace LogSearcher.ViewModels
 
         #region Button-methods
 
-        public void OpenSourceFolder()
+        public void BrowseForSourceFolder()
         {
             var target = InputSourceFolder.ValidateDirectory() == true ? InputSourceFolder : "";
-
             var folder = FileHandler.BrowseForFolder(target);
-
-            if (folder.ValidateDirectory()) //TODO: ensure duplicate entries are not allowed
-            {
-                SourceDirectory sourceDir = new SourceDirectory(folder);
-                SourceDirectories.Add(sourceDir);
-
-                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
-            }
+            AcceptSourceFolder(folder);
         }
-
+        
         public void SubmitSourceFolder()
         {
-            if (InputSourceFolder.ValidateDirectory())  //TODO: ensure duplicate entries are not allowed
-            {
-                SourceDirectory sourceDir = new SourceDirectory(InputSourceFolder);
-                sourceDirectories.Add(sourceDir);
+            AcceptSourceFolder(InputSourceFolder);
+        }
 
-                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
-            }
+        public void SetSourceFolder(object parameter)
+        {
+            if (parameter == null) return;
+            var dir = parameter as SourceDirectory;
+            InputSourceFolder = dir.DirectoryName;
         }
 
         public void ResetSourceFolderDisplay()
@@ -234,7 +239,7 @@ namespace LogSearcher.ViewModels
         #endregion
 
         #region Methods
-        public async Task SearchForFiles()
+        private async Task SearchForFiles()
         {
             SearchProfile profile = new SearchProfile(InputSearchString, InputExtension);
             FileGatherer gatherer = new FileGatherer(SourceDirectories, profile);
@@ -250,13 +255,14 @@ namespace LogSearcher.ViewModels
             HitList = localHits;
         }    
         
-        public async Task CopySelectedFiles(object elements)
+        private async Task CopySelectedFiles(object elements)
         {
             var selectedFiles = new ObservableCollection<HitFile>();
 
             // first, get selected files
             if (elements != null)
             {
+                //TODO: there must be a LINQ expression like js objList.map(x => selectedFiles.Add(x as HitFile)) ??
                 var objList = (IEnumerable<object>)elements;
                 foreach (var obj in objList)
                 {
@@ -292,7 +298,23 @@ namespace LogSearcher.ViewModels
             HitList = temp;
         }
 
-        public bool EnableCopyAll()
+        private void AcceptSourceFolder(string folder)
+        {
+            if (folder.ValidateDirectory()) //TODO: ensure duplicate entries are not allowed
+            {
+                SourceDirectory sourceDir = new SourceDirectory(folder);
+                var sourceExists = SourceDirectories.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();
+                var historyExists = DirectoryHistory.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();
+
+                if(sourceExists == null) SourceDirectories.Add(sourceDir);
+                if(historyExists == null) DirectoryHistory.Add(sourceDir);
+
+                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
+
+            }
+        }
+        
+        private bool EnableCopyAll()
         {
             var foundFiles = HitList.Count > 0 ? true : false;
             var destinationOK = inputTargetFolder.ValidateDirectory();
@@ -300,7 +322,7 @@ namespace LogSearcher.ViewModels
             return foundFiles && destinationOK;
         }
 
-        public bool EnableCopySelected()
+        private bool EnableCopySelected()
         {
             var selected = SelectedFile != null ? true : false;
             var destinationOK = inputTargetFolder.ValidateDirectory();
