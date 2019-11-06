@@ -47,7 +47,7 @@ namespace LogSearcher.Domain
         
         public static string BrowseForFolder(string initialDir = "")
         {        
-            string selectedFolder = null;
+            string selectedFolder = initialDir;
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Multiselect = false;
 
@@ -99,6 +99,18 @@ namespace LogSearcher.Domain
             var startInfo = new ProcessStartInfo(hitFile.FilePathAndName) { UseShellExecute = true };
             using (var p = new Process())
             {                
+                p.StartInfo = startInfo;
+                p.Start();
+            }
+        }
+
+        public static async Task OpenExplorer(LogDirectory directory)
+        {
+            if (!directory.DirInfo.Exists) return;
+
+            var startInfo = new ProcessStartInfo(directory.DirInfo.FullName) { UseShellExecute = true };
+            using (var p = new Process())
+            {
                 p.StartInfo = startInfo;
                 p.Start();
             }

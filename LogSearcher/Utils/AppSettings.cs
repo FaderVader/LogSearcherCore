@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
 using System.IO;
 
 namespace LogSearcher.Utils
@@ -17,6 +16,7 @@ namespace LogSearcher.Utils
             configRoot = builder.Build();
             var appSettings = configRoot.GetSection("AppSettings");
             
+            
         }
 
         public static Settings GetSettings()
@@ -31,5 +31,6 @@ namespace LogSearcher.Utils
         public string NotePadPP_Path { get; set; }
         public string NotePadPP_Exe { get; set; }
         public bool UseNPP { get; set; }
+        public string HistoryPath { get; set; }
     }
 }

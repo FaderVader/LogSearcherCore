@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LogSearcher.Models
 {
+    [Serializable]
     public class SourceDirectory: LogDirectory
     {
         private List<HitFile> foundFileList;

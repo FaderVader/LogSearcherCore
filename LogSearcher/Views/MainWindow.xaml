@@ -143,7 +143,7 @@
         </Button>
 
 
-        <!-- Copy files to folder -->
+        <!-- Copy files to folder -->        
         <TextBlock Grid.Row="7" Grid.Column="1"
                    Margin="0 10 0 0">
                    Target folder:
@@ -160,6 +160,18 @@
                 MinWidth="20"
                 HorizontalAlignment="Left"
                 >...</Button>
+        <Button Command="{Binding OpenExplorerButton}"
+                CommandParameter="{Binding InputTargetFolder}"
+                Grid.Row="8"
+                Grid.Column="2"
+                Margin="0 5 0 0"
+                MaxHeight="20"
+                MaxWidth="80"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                >
+            Open Folder
+        </Button>
 
 
         <!-- Execute search -->
@@ -206,6 +218,13 @@
             <TextBlock Margin="0 10 0 0">Path of selected file:</TextBlock>
             <TextBox Text="{Binding SelectedFile.FilePath, Mode=OneWay}"
                  Margin="0 2 10 0"/>
+            <Button Command="{Binding OpenExplorerButton}"
+                    CommandParameter="{Binding SelectedFile.FilePath}"
+                    Margin="0 5 0 0"
+                    HorizontalAlignment="Left"
+                    MaxWidth="80">
+                Open Folder
+            </Button>
         </StackPanel>
 
         <!--Use Notepad++ ?-->

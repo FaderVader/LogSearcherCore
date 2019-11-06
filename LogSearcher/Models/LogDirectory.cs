@@ -20,26 +20,16 @@ namespace LogSearcher.Models
         {
             get { return DirInfo.FullName; }
         }
-
-
-
+        
         public DirectoryInfo DirInfo
         {
             get { return dirInfo; }
             private set { dirInfo = value; }
         }
-
-
-
+        
         public string ParentDirectory
         {
             get { return DirInfo.Parent.ToString(); }            
         }
-
-
-
-
-
-
     }
 }
