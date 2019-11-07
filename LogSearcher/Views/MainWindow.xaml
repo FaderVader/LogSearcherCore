@@ -48,8 +48,9 @@
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
 
-        <!-- SearchInput /  SourceFolder Management -->
-        <StackPanel Grid.Row="1" Grid.Column="1">
+        <!-- Left Column:-->
+        <!--  SearchInput /  SourceFolder Management / SourceList -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
 
             <!-- Input Search Text-->
             <StackPanel >
@@ -61,194 +62,120 @@
                 <StackPanel Orientation="Vertical">
                     <!-- filename/extension -->
                     <TextBlock>Filename:</TextBlock>
-                    <TextBlock>(use * or ?)</TextBlock>
                     <TextBox Text="{Binding Path=InputExtension}"/>
+                    <TextBlock>(use * or ?)</TextBlock>
                 </StackPanel>
             </StackPanel>
 
             <!-- Heading & Add button-->
-            <StackPanel>
+            <StackPanel Orientation="Horizontal">
                 <TextBlock>Source folder:</TextBlock>
-                <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"/>
+                <Button Command="{Binding SubmitSourceFolderButton}">Add</Button>
             </StackPanel>
 
             <!-- InputString & ... button -->
-            <StackPanel>
-
+            <StackPanel Orientation="Horizontal">
+                <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"/>
                 <Button Command="{Binding OpenSourceFolderButton}">...</Button>
             </StackPanel>
 
             <!-- HistoryDrop & UseHist button-->
-            <StackPanel></StackPanel>
-
-        </StackPanel>
-
-
-
-
-        <!-- Input folders to search -->
-
-
-        <StackPanel Grid.Row="4" 
-                Grid.Column="2" 
-                Orientation="Horizontal">
-            <ComboBox x:Name="History"
-                ItemsSource="{Binding Path=DirectoryHistory}"
-                DisplayMemberPath="DirectoryName"
-                Margin="0 5 0 10"
-                MinWidth="185">
-            </ComboBox>
-            <Button Margin="15 5 0 10"
-                    Command="{Binding SetInputFromHistoryButton}"
+            <StackPanel Orientation="Horizontal">
+                <ComboBox x:Name="History" 
+                    ItemsSource="{Binding Path=DirectoryHistory}"
+                    DisplayMemberPath="DirectoryName">
+                </ComboBox>
+                <Button Command="{Binding SetInputFromHistoryButton}"
                     CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
                     >Use History</Button>
-            <Button Command="{Binding SubmitSourceFolderButton}"
-                Margin="15 5 0 10">
-                Add
-            </Button>
+            </StackPanel>
+
+            <!-- SourceFolder list -->
+            <StackPanel Orientation="Vertical">
+                <TextBlock>List of source folders</TextBlock>
+                <!-- Show folders to search -->
+                <ListView ItemsSource="{Binding SourceDirectories}"
+                  DisplayMemberPath="DirectoryName"
+                  SelectedItem="{Binding Path=SelectedInputSourceFolder}">
+                </ListView>
+            </StackPanel>
         </StackPanel>
 
 
-
-        <!-- Search-folders, heading -->
-        <TextBlock Grid.Row="6" 
-                   Grid.Column="1" 
-                   Grid.ColumnSpan="2"
-                   VerticalAlignment="Top"
-                   Margin="0 0 0 0">List of source folders</TextBlock>
-
-        <!-- Show folders to search -->
-        <ListView ItemsSource="{Binding SourceDirectories}"
-                  DisplayMemberPath="DirectoryName"
-                  SelectedItem="{Binding Path=SelectedInputSourceFolder}"                  
-                  Grid.Row="5" Grid.Column="1"
-                  Grid.ColumnSpan="5"
-                  Margin="0 0 10 0"
-                  MinHeight="100">
-        </ListView>
-
-        <!-- Reset list of search-folders -->
-        <Button Command="{Binding ResetSourceFolderDisplayButton}"
-                Grid.Row="6" Grid.Column="4"
-                Margin="0 10 10 10"
-                Grid.ColumnSpan="2"
-                HorizontalAlignment="Right"
-                MaxHeight="20">
-            Reset
-        </Button>
+        <!-- Search / Cancel  / Reset-->
+        <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Command="{Binding GoSearch}">SEARCH</Button>
+                <Button Command="{Binding ResetSourceFolderDisplayButton}">
+                    Reset
+                </Button>
+            </StackPanel>
+        </StackPanel>
 
 
-        <!-- Define target folder -->        
-        <TextBlock Grid.Row="7" Grid.Column="1"
-                   Margin="0 10 0 0">
-                   Target folder:
-        </TextBlock>
-        <TextBox Text="{Binding Path=InputTargetFolder}"
-                 Grid.Row="7" 
-                 Grid.Column="2"
-                 Grid.ColumnSpan="3"
-                 Margin="0 10 0 0">
-        </TextBox>
-        <Button Command="{Binding OpenTargetFolderButton}"
-                Grid.Column="5" Grid.Row="7"
-                Margin="5 10 10 0"
-                MinWidth="20"
-                HorizontalAlignment="Left"
-                >...</Button>
-        <Button Command="{Binding OpenExplorerButton}"
-                CommandParameter="{Binding InputTargetFolder}"
-                Grid.Row="8"
-                Grid.Column="2"
-                Margin="0 5 0 0"
-                MaxHeight="20"
-                MaxWidth="80"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                >
-            Open Folder
-        </Button>
-
-
-        <!-- Execute search -->
-        <Button Command="{Binding GoSearch}"
-                Grid.Row="9" 
-                Grid.Column="2"
-                Grid.ColumnSpan="2"
-                Background="Green"                
-                Margin="0 20 0 20">
-            SEARCH
-        </Button>
-
-
-        <!-- Display list of found files-->
-        <TextBlock Text="{Binding SearchStatus}"
-                   Grid.Row="1"
-                   Grid.Column="6">
-        </TextBlock>
-        <ListView x:Name="FoundFiles"
+        <!-- Right Column: -->
+        <!-- Found Files / handle / SelectedFile  -->
+        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical">
+            <!-- Found Files -->
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding SearchStatus}"/>
+                <ListView x:Name="FoundFiles"
                   ItemsSource="{Binding HitList}"                   
                   ItemContainerStyle="{StaticResource ListViewItems}"
                   ItemTemplate="{StaticResource FoundFilesView}"
                   SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
-                  SelectionMode="Extended"
-                  Grid.Row="2" 
-                  Grid.Column="6"
-                  Grid.RowSpan="6" 
-                  Grid.ColumnSpan="3"
-                  Margin="0 0 10 0"
-                  VerticalAlignment="Top"
-                  MinWidth="180"
-                  MaxHeight="215"
-                  MinHeight="200">
-        </ListView>    
-        
-        <!-- Selected FoundFile info -->
-        <StackPanel Grid.Row="7" Grid.Column="6" Grid.ColumnSpan="2" >
-            <TextBlock>1st found line:</TextBlock>
-            <TextBox Text="{Binding FileContent}" TextWrapping="Wrap"                     
-                 Margin="0 2 10 0">
-            </TextBox>
+                  SelectionMode="Extended">
+                </ListView>
+            </StackPanel>
+
+            <!-- Selected File Info -->
+            <StackPanel Orientation="Vertical">
+                <!-- 1st found line-->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock>1st found line:</TextBlock>
+                    <TextBox Text="{Binding FileContent}" TextWrapping="Wrap">
+                    </TextBox>
+                </StackPanel>
+
+                <!-- Open found file folder-->
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Path of selected file:</TextBlock>
+                        <Button Command="{Binding OpenExplorerButton}"
+                    CommandParameter="{Binding SelectedFile.FilePath}">
+                            Open Folder
+                        </Button>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBox Text="{Binding SelectedFile.FilePath, Mode=OneWay}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Selected Files Handle -->        
+                    <StackPanel Orientation="Horizontal">
+                        <Button Command="{Binding OpenFileButton}">Open File</Button>
+                        <TextBlock>Use Notepad++:</TextBlock>
+                        <CheckBox IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"/>
+                        <Button Command="{Binding Path=CopyAllButton}">Copy All</Button>
+                        <Button Command="{Binding Path=CopySelectedButton}"
+                            CommandParameter="{Binding ElementName=FoundFiles, Path=SelectedItems}">
+                            Copy Selected
+                        </Button>
+                    </StackPanel>
+            </StackPanel>
         </StackPanel>
 
-        <StackPanel Grid.Row="8" Grid.Column="6" Grid.ColumnSpan="2" >
-            <TextBlock Margin="0 10 0 0">Path of selected file:</TextBlock>
-            <TextBox Text="{Binding SelectedFile.FilePath, Mode=OneWay}"
-                 Margin="0 2 10 0"/>
-            <Button Command="{Binding OpenExplorerButton}"
-                    CommandParameter="{Binding SelectedFile.FilePath}"
-                    Margin="0 5 0 0"
-                    HorizontalAlignment="Left"
-                    MaxWidth="80">
-                Open Folder
-            </Button>
-        </StackPanel>
-
-        <!--Use Notepad++ ?-->
-        <StackPanel Grid.Row="6" Grid.Column="6"    
-                    Orientation="Horizontal"
-                    Margin="0 0 0 0">
-            <Button Command="{Binding OpenFileButton}"
-                    Margin="0 20 20 20 "
-                    MaxWidth="70"
-                    HorizontalAlignment="Left">
-                Open File
-            </Button>
-            <TextBlock Margin="0 23 5 0">
-                    Use Notepad++:
-            </TextBlock>
-            <CheckBox IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"
-                      Margin="0 23 5 0">
-            </CheckBox>
-            <Button Command="{Binding Path=CopyAllButton}"                    
-                    Margin="20 23 5 20">
-                Copy All
-            </Button>
-            <Button Command="{Binding Path=CopySelectedButton}"
-                    CommandParameter="{Binding ElementName=FoundFiles, Path=SelectedItems}"                   
-                    Margin="20 23 5 20">
-                Copy Selected
-            </Button>
-
+        <!--Target Folder Copy -->
+        <StackPanel Grid.Row="2" Grid.Column="2" VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Target folder:</TextBlock>
+                <Button Command="{Binding OpenExplorerButton}"
+                    CommandParameter="{Binding InputTargetFolder}">Open Folder</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Text="{Binding Path=InputTargetFolder}"/>
+                <Button Command="{Binding OpenTargetFolderButton}">...</Button>
+            </StackPanel>
         </StackPanel>
 
     </Grid>
