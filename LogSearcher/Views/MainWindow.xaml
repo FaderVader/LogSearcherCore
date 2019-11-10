@@ -35,92 +35,115 @@
 
 
     <Grid>
+        <!-- SuperGrid -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="10"/>
-        </Grid.RowDefinitions>
 
-        <!-- Left Column:-->
-        <!--  SearchInput -->
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
+        <!-- Left Column -->
+        <Grid Grid.Column="0">
 
-            <!-- Input Search Text-->
-            <StackPanel >
-                <!-- Find in File -->
-                <StackPanel Orientation="Vertical">
-                    <TextBlock>Find in file:</TextBlock>
-                    <TextBox Text ="{Binding Path=InputSearchString}"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            
+            <!--  SearchInput -->
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
+
+                <!-- Input Search Text-->
+                <StackPanel >
+                    <!-- Find in File -->
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock>Find in file:</TextBlock>
+                        <TextBox Text ="{Binding Path=InputSearchString}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical">
+                        <!-- filename/extension -->
+                        <TextBlock>Filename:</TextBlock>
+                        <TextBox Text="{Binding Path=InputExtension}"/>
+                        <TextBlock>(use * or ?)</TextBlock>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Orientation="Vertical">
-                    <!-- filename/extension -->
-                    <TextBlock>Filename:</TextBlock>
-                    <TextBox Text="{Binding Path=InputExtension}"/>
-                    <TextBlock>(use * or ?)</TextBlock>
+            </StackPanel>
+
+            <!-- SourceFolder Management / SourceList -->
+            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
+                <!-- Heading & Add button-->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Source folder:</TextBlock>
+                    <Button Command="{Binding SubmitSourceFolderButton}">Add</Button>
                 </StackPanel>
-            </StackPanel>
-        </StackPanel>
 
-        <!-- SourceFolder Management / SourceList -->
-        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
-            <!-- Heading & Add button-->
-            <StackPanel Orientation="Horizontal">
-                <TextBlock>Source folder:</TextBlock>
-                <Button Command="{Binding SubmitSourceFolderButton}">Add</Button>
-            </StackPanel>
+                <!-- InputString & ... button -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"/>
+                    <Button Command="{Binding OpenSourceFolderButton}">...</Button>
+                </StackPanel>
 
-            <!-- InputString & ... button -->
-            <StackPanel Orientation="Horizontal">
-                <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"/>
-                <Button Command="{Binding OpenSourceFolderButton}">...</Button>
-            </StackPanel>
-
-            <!-- HistoryDrop & UseHist button-->
-            <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="History" 
+                <!-- HistoryDrop & UseHist button-->
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox x:Name="History" 
                     ItemsSource="{Binding Path=DirectoryHistory}"
                     DisplayMemberPath="DirectoryName">
-                </ComboBox>
-                <Button Command="{Binding SetInputFromHistoryButton}"
+                    </ComboBox>
+                    <Button Command="{Binding SetInputFromHistoryButton}"
                     CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
                     >Use History</Button>
-            </StackPanel>
+                </StackPanel>
 
-            <!-- SourceFolder list -->
-            <StackPanel Orientation="Vertical">
-                <TextBlock>List of source folders</TextBlock>
-                <!-- Show folders to search -->
-                <ListView ItemsSource="{Binding SourceDirectories}"
+                <!-- SourceFolder list -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock>List of source folders</TextBlock>
+                    <!-- Show folders to search -->
+                    <ListView ItemsSource="{Binding SourceDirectories}"
                   DisplayMemberPath="DirectoryName"
                   SelectedItem="{Binding Path=SelectedInputSourceFolder}"
                   MinHeight="50">
-                </ListView>
+                    </ListView>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
 
-        <!-- Search / Cancel  / Reset-->
-        <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Command="{Binding GoSearch}">SEARCH</Button>
-                <Button Command="{Binding ResetSourceFolderDisplayButton}">
-                    Reset
-                </Button>
+            <!-- Search / Cancel  / Reset-->
+            <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Command="{Binding GoSearch}">SEARCH</Button>
+                    <Button Command="{Binding ResetSourceFolderDisplayButton}">
+                        Reset
+                    </Button>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </Grid>
 
-
+        
+        
+        
         <!-- Right Column: -->
-        <!-- Found Files -->
-        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" 
+        <Grid Grid.Column="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>                
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <!-- Found Files -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" 
                     Height="Auto">
             <!-- Found Files -->
             <StackPanel Orientation="Vertical">
@@ -138,7 +161,7 @@
         </StackPanel>
 
         <!-- Handle / SelectedFile  -->
-        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Vertical">
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
             <!-- Selected File Info -->
             <StackPanel Orientation="Vertical">
                 <!-- 1st found line-->
@@ -162,22 +185,22 @@
                     </StackPanel>
                 </StackPanel>
 
-                <!-- Selected Files Handle -->        
-                    <StackPanel Orientation="Horizontal">
-                        <Button Command="{Binding OpenFileButton}">Open File</Button>
-                        <TextBlock>Use Notepad++:</TextBlock>
-                        <CheckBox IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"/>
-                        <Button Command="{Binding Path=CopyAllButton}">Copy All</Button>
-                        <Button Command="{Binding Path=CopySelectedButton}"
+                <!-- Selected Files Handle -->
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding OpenFileButton}">Open File</Button>
+                    <TextBlock>Use Notepad++:</TextBlock>
+                    <CheckBox IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"/>
+                    <Button Command="{Binding Path=CopyAllButton}">Copy All</Button>
+                    <Button Command="{Binding Path=CopySelectedButton}"
                             CommandParameter="{Binding ElementName=FoundFiles, Path=SelectedItems}">
-                            Copy Selected
-                        </Button>
-                    </StackPanel>
+                        Copy Selected
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 
         <!--Target Folder Copy -->
-        <StackPanel Grid.Row="3" Grid.Column="2" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom">
             <StackPanel Orientation="Horizontal">
                 <TextBlock>Target folder:</TextBlock>
                 <Button Command="{Binding OpenExplorerButton}"
@@ -188,6 +211,7 @@
                 <Button Command="{Binding OpenTargetFolderButton}">...</Button>
             </StackPanel>
         </StackPanel>
+        </Grid>
 
     </Grid>
 </Window>
