@@ -138,13 +138,13 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>                
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="*"/>                
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
             <!-- Found Files -->
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" 
-                    Height="Auto">
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" >
+                
             <!-- Found Files -->
             <StackPanel Orientation="Vertical">
                 <TextBlock Text="{Binding SearchStatus}"/>
@@ -153,7 +153,7 @@
                   ItemContainerStyle="{StaticResource ListViewItems}"
                   ItemTemplate="{StaticResource FoundFilesView}"
                   MinHeight="100"
-                  MaxHeight="400"
+                  MaxHeight="500"
                   SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
                   SelectionMode="Extended">
                 </ListView>
@@ -161,7 +161,9 @@
         </StackPanel>
 
         <!-- Handle / SelectedFile  -->
-        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
+        <StackPanel Grid.Row="2" Grid.Column="1" 
+                    Orientation="Vertical" 
+                    VerticalAlignment="Bottom">
             <!-- Selected File Info -->
             <StackPanel Orientation="Vertical">
                 <!-- 1st found line-->
@@ -197,21 +199,25 @@
                     </Button>
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
+
+                <StackPanel >
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Target folder:</TextBlock>
+                        <Button Command="{Binding OpenExplorerButton}"
+                    CommandParameter="{Binding InputTargetFolder}">Open Folder</Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Text="{Binding Path=InputTargetFolder}"/>
+                        <Button Command="{Binding OpenTargetFolderButton}">...</Button>
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
 
         <!--Target Folder Copy -->
-        <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock>Target folder:</TextBlock>
-                <Button Command="{Binding OpenExplorerButton}"
-                    CommandParameter="{Binding InputTargetFolder}">Open Folder</Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBox Text="{Binding Path=InputTargetFolder}"/>
-                <Button Command="{Binding OpenTargetFolderButton}">...</Button>
-            </StackPanel>
-        </StackPanel>
+
         </Grid>
+        <!--Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom"-->
 
     </Grid>
 </Window>
