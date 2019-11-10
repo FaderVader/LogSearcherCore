@@ -43,13 +43,14 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
 
         <!-- Left Column:-->
-        <!--  SearchInput /  SourceFolder Management / SourceList -->
+        <!--  SearchInput -->
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
 
             <!-- Input Search Text-->
@@ -66,7 +67,10 @@
                     <TextBlock>(use * or ?)</TextBlock>
                 </StackPanel>
             </StackPanel>
+        </StackPanel>
 
+        <!-- SourceFolder Management / SourceList -->
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical">
             <!-- Heading & Add button-->
             <StackPanel Orientation="Horizontal">
                 <TextBlock>Source folder:</TextBlock>
@@ -96,14 +100,15 @@
                 <!-- Show folders to search -->
                 <ListView ItemsSource="{Binding SourceDirectories}"
                   DisplayMemberPath="DirectoryName"
-                  SelectedItem="{Binding Path=SelectedInputSourceFolder}">
+                  SelectedItem="{Binding Path=SelectedInputSourceFolder}"
+                  MinHeight="50">
                 </ListView>
             </StackPanel>
         </StackPanel>
 
 
         <!-- Search / Cancel  / Reset-->
-        <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Command="{Binding GoSearch}">SEARCH</Button>
                 <Button Command="{Binding ResetSourceFolderDisplayButton}">
@@ -114,8 +119,9 @@
 
 
         <!-- Right Column: -->
-        <!-- Found Files / handle / SelectedFile  -->
-        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical">
+        <!-- Found Files -->
+        <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Vertical" 
+                    Height="Auto">
             <!-- Found Files -->
             <StackPanel Orientation="Vertical">
                 <TextBlock Text="{Binding SearchStatus}"/>
@@ -123,11 +129,16 @@
                   ItemsSource="{Binding HitList}"                   
                   ItemContainerStyle="{StaticResource ListViewItems}"
                   ItemTemplate="{StaticResource FoundFilesView}"
+                  MinHeight="100"
+                  MaxHeight="400"
                   SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
                   SelectionMode="Extended">
                 </ListView>
             </StackPanel>
+        </StackPanel>
 
+        <!-- Handle / SelectedFile  -->
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Vertical">
             <!-- Selected File Info -->
             <StackPanel Orientation="Vertical">
                 <!-- 1st found line-->
@@ -166,7 +177,7 @@
         </StackPanel>
 
         <!--Target Folder Copy -->
-        <StackPanel Grid.Row="2" Grid.Column="2" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="3" Grid.Column="2" VerticalAlignment="Bottom">
             <StackPanel Orientation="Horizontal">
                 <TextBlock>Target folder:</TextBlock>
                 <Button Command="{Binding OpenExplorerButton}"
