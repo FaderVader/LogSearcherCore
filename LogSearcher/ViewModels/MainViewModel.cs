@@ -23,7 +23,7 @@ namespace LogSearcher.ViewModels
             InputExtension = "*txt";
             InputSearchString = "error";
             InputTargetFolder = @"C:\temp\test";
-            InputSourceFolder = @"C:\temp\LogSearcherTestFiles\VCP_logs";
+            InputSourceFolder = ""; //@"C:\temp\LogSearcherTestFiles\VCP_logs";
             SearchStatus = "";
 
             // get settings
@@ -41,11 +41,14 @@ namespace LogSearcher.ViewModels
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);
             CopySelectedButton = new RelayCommandWithParams(CopySelected, EnableCopySelected);
             SetInputFromHistoryButton = new RelayCommandWithParams(SetSourceFolder);
+            SetTargetFromHistoryButton = new RelayCommandWithParams(SetTargetFolder);
             OpenExplorerButton = new RelayCommandWithParams(OpenExplorer);
+            ResetHistoryButton = new RelayCommandNoParams(ResetHistory);
 
             InitializeHistory();
         }
-        
+
+
         #region RelayCommands
         public RelayCommandNoParams GoSearch { get; }
         public RelayCommandNoParams OpenSourceFolderButton { get; }
@@ -56,6 +59,9 @@ namespace LogSearcher.ViewModels
         public RelayCommandNoParams OpenFileButton { get; }
         public RelayCommandWithParams CopySelectedButton { get; }
         public RelayCommandWithParams SetInputFromHistoryButton { get; }
+        public RelayCommandWithParams SetTargetFromHistoryButton { get; }
+
+        public RelayCommandNoParams ResetHistoryButton { get; }
         public RelayCommandWithParams OpenExplorerButton { get; }
 
         #endregion
@@ -172,34 +178,46 @@ namespace LogSearcher.ViewModels
         #endregion
 
         #region Button-methods
-        public void BrowseForSourceFolder()
+        private void BrowseForSourceFolder()
         {
             var target = InputSourceFolder.ValidateDirectory() == true ? InputSourceFolder : "";
             var folder = FileHandler.BrowseForFolder(target);
-            AcceptSourceFolder(folder);
+            AcceptFolderToSources(folder);
+            AcceptFolderToHistory(folder);
         }
-        public void SubmitSourceFolder()
+        private void SubmitSourceFolder()
         {
-            AcceptSourceFolder(InputSourceFolder);
+            AcceptFolderToSources(InputSourceFolder);
         }
-        public void SetSourceFolder(object parameter)
+        private void SetSourceFolder(object parameter)
         {
             if (parameter == null) return;
-            var dir = parameter as SourceDirectory;
-            InputSourceFolder = dir.DirectoryName;
+            var dir = parameter as LogDirectory;
+            AcceptFolderToSources(dir.DirectoryName);
+            AcceptFolderToHistory(dir.DirectoryName);
         }
-        public void ResetSourceFolderDisplay()
+        private void SetTargetFolder(object parameter)
+        {
+            if (parameter == null) return;
+            var source = parameter as LogDirectory;
+            AcceptFolderToHistory(source?.DirectoryName);
+
+            InputTargetFolder = source?.DirectoryName;
+        }
+        private void ResetSourceFolderDisplay()
         {
             // reset value of SourceFolderDisplay
             SourceDirectories = new ObservableCollection<SourceDirectory>();
             HitList = new ObservableCollection<HitFile>();
         }
-        public void OpenTargetFolder()
+        private void OpenTargetFolder()
         {
             var target = InputTargetFolder.ValidateDirectory() == true ? InputTargetFolder : "";
             InputTargetFolder = FileHandler.BrowseForFolder(target);
+
+            AcceptFolderToHistory(InputTargetFolder);
         }
-        public async void StartSearch()
+        private async void StartSearch()
         {
             SearchStatus = "Searching...";
             HitList.Clear();
@@ -213,17 +231,17 @@ namespace LogSearcher.ViewModels
             SearchStatus = "Found Files:";
             await persistHistory.SaveHistory(DirectoryHistory);
         }
-        public async void CopyAllFiles()
+        private async void CopyAllFiles()
         {
             await FileHandler.CopyHits(HitList, InputTargetFolder);
             UpdateHitList();
         }
-        public async void CopySelected(object elements)
+        private async void CopySelected(object elements)
         {
             if (elements == null) return;
             await CopySelectedFiles(elements);
         }
-        public async void OpenExplorer(object path)
+        private async void OpenExplorer(object path)
         {
             if (path != null && (path as string).ValidateDirectory())
             {
@@ -231,7 +249,7 @@ namespace LogSearcher.ViewModels
                 await FileHandler.OpenExplorer(directory);
             }
         }
-        public void OpenFile()
+        private void OpenFile()
         {
             var useNPP = SelectUseNPP;
             if (useNPP)
@@ -240,6 +258,10 @@ namespace LogSearcher.ViewModels
                 return;
             }
             FileHandler.OpenWithDefault(SelectedFile);
+        }
+        private void ResetHistory()
+        {
+            DirectoryHistory = new BindingList<LogDirectory>();
         }
         #endregion
 
@@ -303,19 +325,25 @@ namespace LogSearcher.ViewModels
             HitList = temp;
         }
 
-        private void AcceptSourceFolder(string folder)
+        private void AcceptFolderToSources(string folder)
         {
             if (folder.ValidateDirectory())
             {
                 SourceDirectory sourceDir = new SourceDirectory(folder);
-                var sourceExists = SourceDirectories.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();
-                var historyExists = DirectoryHistory.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();
-
-                if (sourceExists == null) SourceDirectories.Add(sourceDir);  //ensure duplicate entries are not allowed
-                if (historyExists == null) DirectoryHistory.Add(sourceDir);
+                var sourceExists = SourceDirectories.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();  
+                if (sourceExists == null) SourceDirectories.Add(sourceDir);  //ensure duplicate entries are not allowed                
 
                 InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
+            }
+        }
 
+        private void AcceptFolderToHistory(string folder)
+        {
+            if (folder.ValidateDirectory())
+            {
+                TargetDirectory newDir = new TargetDirectory(folder);
+                var historyExists = DirectoryHistory.Where(item => item.DirectoryName == newDir.DirectoryName).FirstOrDefault();
+                if (historyExists == null) DirectoryHistory.Add(newDir);
             }
         }
 
