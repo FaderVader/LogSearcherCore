@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using static LogSearcher.Domain.Validate;
 
@@ -70,6 +71,8 @@ namespace LogSearcher.Domain
                     break;
                 }
             }
+
+            //var result = lines.ToList().Where(lines => lines.Contains(searchProfile.SearchString)); //TODO: check if LINQ can be used instead of for-loop?
 
             position.Column = position.Text.IndexOf(searchProfile.SearchString) +1; // +1 -> convert from array-pos to text column num
 

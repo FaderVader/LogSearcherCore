@@ -5,6 +5,8 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>LogSearcherCore.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

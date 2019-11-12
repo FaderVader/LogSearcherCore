@@ -66,7 +66,8 @@ namespace LogSearcher.Domain
             List<string> list = new List<string>();
             try
             {
-                list = Directory.GetFiles(directory, searchPattern).ToList();
+                //list = Directory.GetFiles(directory, searchPattern).ToList();
+                list = await Task.Run(() => Directory.GetFiles(directory, searchPattern).ToList());
             }
             catch (Exception)
             {
