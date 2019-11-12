@@ -21,8 +21,8 @@ namespace LogSearcher.ViewModels
 
             // reset ui
             InputExtension = "*txt";
-            InputSearchString = "error";
-            InputTargetFolder = @"C:\temp\test";
+            InputSearchString = "";
+            InputTargetFolder = "";
             InputSourceFolder = ""; //@"C:\temp\LogSearcherTestFiles\VCP_logs";
             SearchStatus = "";
 
@@ -32,18 +32,21 @@ namespace LogSearcher.ViewModels
             SelectUseNPP = settings.UseNPP;
 
             // wire-up buttons
-            GoSearch = new RelayCommandNoParams(StartSearch);
-            OpenSourceFolderButton = new RelayCommandNoParams(BrowseForSourceFolder);
-            SubmitSourceFolderButton = new RelayCommandNoParams(SubmitSourceFolder);
-            ResetSourceFolderDisplayButton = new RelayCommandNoParams(ResetSourceFolderDisplay);
-            OpenTargetFolderButton = new RelayCommandNoParams(OpenTargetFolder);
-            OpenFileButton = new RelayCommandNoParams(OpenFile);
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);
-            CopySelectedButton = new RelayCommandWithParams(CopySelected, EnableCopySelected);
-            SetInputFromHistoryButton = new RelayCommandWithParams(SetSourceFolder);
-            SetTargetFromHistoryButton = new RelayCommandWithParams(SetTargetFolder);
-            OpenExplorerButton = new RelayCommandWithParams(OpenExplorer);
             ResetHistoryButton = new RelayCommandNoParams(ResetHistory);
+            OpenSourceFolderButton = new RelayCommandNoParams(BrowseForSourceFolder);
+            OpenTargetFolderButton = new RelayCommandNoParams(OpenTargetFolder);
+            ResetSourceFolderDisplayButton = new RelayCommandNoParams(ResetSourceFolderDisplay);
+
+            GoSearch = new RelayCommandNoParams(StartSearch, () => SourceDirectories.Count > 0);
+            OpenFileButton = new RelayCommandNoParams(OpenFile, () => SelectedFile != null);
+            SubmitSourceFolderButton = new RelayCommandNoParams(SubmitSourceFolder, () => InputSourceFolder.ValidateDirectory()); 
+            SetInputFromHistoryButton = new RelayCommandWithParams(SetSourceFolder, () => SelectedHistoryFolder != null);
+            SetTargetFromHistoryButton = new RelayCommandWithParams(SetTargetFolder, () => SelectedHistoryFolder != null);
+            OpenExplorerForTargetButton = new RelayCommandWithParams(OpenExplorer, () => InputTargetFolder.ValidateDirectory());  
+            
+            OpenExplorerButton = new RelayCommandWithParams(OpenExplorer, () => SelectedFile != null);
+            CopySelectedButton = new RelayCommandWithParams(CopySelected, EnableCopySelected);
 
             InitializeHistory();
         }
@@ -60,9 +63,9 @@ namespace LogSearcher.ViewModels
         public RelayCommandWithParams CopySelectedButton { get; }
         public RelayCommandWithParams SetInputFromHistoryButton { get; }
         public RelayCommandWithParams SetTargetFromHistoryButton { get; }
-
         public RelayCommandNoParams ResetHistoryButton { get; }
         public RelayCommandWithParams OpenExplorerButton { get; }
+        public RelayCommandWithParams OpenExplorerForTargetButton { get; }
 
         #endregion
 
@@ -75,6 +78,7 @@ namespace LogSearcher.ViewModels
         private TargetDirectory targetDirectory;
         private ObservableCollection<HitFile> hitList;
         private BindingList<LogDirectory> directoryHistory;
+
         public ObservableCollection<SourceDirectory> SourceDirectories
         {
             get { return sourceDirectories; }
@@ -175,6 +179,14 @@ namespace LogSearcher.ViewModels
             set { OnPropertyChanged(ref fileContent, value); }
         }
 
+        private SourceDirectory selectedHistoryFolder;
+        public SourceDirectory SelectedHistoryFolder
+        {
+            get { return selectedHistoryFolder; }
+            set { OnPropertyChanged(ref selectedHistoryFolder, value); }
+        }
+
+
         #endregion
 
         #region Button-methods
@@ -263,6 +275,26 @@ namespace LogSearcher.ViewModels
         {
             DirectoryHistory = new BindingList<LogDirectory>();
         }
+        #endregion
+
+        #region Button-toggles
+
+        private bool EnableCopyAll()
+        {
+            var foundFiles = HitList.Count > 0 ? true : false;
+            var destinationOK = inputTargetFolder.ValidateDirectory();
+
+            return foundFiles && destinationOK;
+        }
+
+        private bool EnableCopySelected()
+        {
+            var selected = SelectedFile != null ? true : false;
+            var destinationOK = inputTargetFolder.ValidateDirectory();
+
+            return selected && destinationOK;
+        }
+
         #endregion
 
         #region Methods
@@ -362,24 +394,8 @@ namespace LogSearcher.ViewModels
                 // if failed to read, we just ignore error and continue
             }
         }
-
-        private bool EnableCopyAll()
-        {
-            var foundFiles = HitList.Count > 0 ? true : false;
-            var destinationOK = inputTargetFolder.ValidateDirectory();
-
-            return foundFiles && destinationOK;
-        }
-
-        private bool EnableCopySelected()
-        {
-            var selected = SelectedFile != null ? true : false;
-            var destinationOK = inputTargetFolder.ValidateDirectory();
-
-            return selected && destinationOK;
-        }
-
-
         #endregion
+
+      
     }
 }

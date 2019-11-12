@@ -104,6 +104,7 @@
                     <ComboBox x:Name="History" 
                     ItemsSource="{Binding Path=DirectoryHistory}"
                     DisplayMemberPath="DirectoryName"
+                              SelectedItem="{Binding SelectedHistoryFolder}"
                               MinWidth="200">
                     </ComboBox>
 
@@ -139,7 +140,9 @@
             <!-- Search / Cancel  / Reset-->
             <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" Background="DimGray">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Command="{Binding GoSearch}">SEARCH</Button>
+                    <Button Command="{Binding GoSearch}" 
+                            Margin="0 0 10 0"
+                            Background="LightGreen">SEARCH</Button>
                     <Button Command="{Binding ResetSourceFolderDisplayButton}">
                         Reset
                     </Button>
@@ -229,7 +232,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontWeight="Bold">Target folder:</TextBlock>
                         <Button Margin="5 0 0 5"
-                            Command="{Binding OpenExplorerButton}"
+                            Command="{Binding OpenExplorerForTargetButton}"
                                 CommandParameter="{Binding InputTargetFolder}">Open Folder</Button>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
