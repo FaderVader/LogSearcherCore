@@ -16,7 +16,7 @@ namespace LogSearcher.Utils
         public string FilePath { get; set; }
         private string fileName = "history.json";
 
-        public PersistHistory(string path = @"C:\temp\settings\")
+        public PersistHistory(string path = @"C:\temp\Settings\")
         {
             FilePath = path;
         }
@@ -25,7 +25,12 @@ namespace LogSearcher.Utils
         {
             // must discard LogDirectory, because DirectoryInfo cannot be serialized
             var cleanedHistory = history.Select(item => new string(item.DirectoryName)).ToList();
-            var json = JsonSerializer.Serialize(cleanedHistory);           
+            var json = JsonSerializer.Serialize(cleanedHistory);   
+            
+            if (!Directory.Exists(FilePath))
+            {
+                Directory.CreateDirectory(FilePath);
+            }
 
             using (StreamWriter destinationStream = File.CreateText(Path.Combine(FilePath, fileName)))
             {

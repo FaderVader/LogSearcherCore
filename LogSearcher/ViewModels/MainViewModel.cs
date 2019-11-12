@@ -47,6 +47,8 @@ namespace LogSearcher.ViewModels
             
             OpenExplorerButton = new RelayCommandWithParams(OpenExplorer, () => SelectedFile != null);
             CopySelectedButton = new RelayCommandWithParams(CopySelected, EnableCopySelected);
+            RemoveFromHistoryButton = new RelayCommandWithParams(RemoveFromHistory, () => SelectedHistoryFolder != null);
+            RemoveFromSourceListButton = new RelayCommandWithParams(RemoveFromSourceList, () => SelectedInputSourceFolder != null);
 
             InitializeHistory();
         }
@@ -66,6 +68,8 @@ namespace LogSearcher.ViewModels
         public RelayCommandNoParams ResetHistoryButton { get; }
         public RelayCommandWithParams OpenExplorerButton { get; }
         public RelayCommandWithParams OpenExplorerForTargetButton { get; }
+        public RelayCommandWithParams RemoveFromSourceListButton { get;}
+        public RelayCommandWithParams RemoveFromHistoryButton { get; }
 
         #endregion
 
@@ -274,6 +278,19 @@ namespace LogSearcher.ViewModels
         private void ResetHistory()
         {
             DirectoryHistory = new BindingList<LogDirectory>();
+        }
+        private void RemoveFromSourceList(object parameter)        
+        {
+            if (parameter == null) return;
+
+            var directory = parameter as SourceDirectory;
+            SourceDirectories.Remove(directory);
+        }
+        private void RemoveFromHistory(object parameter)
+        {
+            if (parameter == null) return;
+            var directory = parameter as LogDirectory;
+            DirectoryHistory.Remove(directory);
         }
         #endregion
 

@@ -95,7 +95,7 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"
                              MinWidth="200"/>
-                    
+
                 </StackPanel>
 
                 <!-- HistoryDrop & UseHist button-->
@@ -112,14 +112,18 @@
                         <Button Margin="0 5 0 0" MaxWidth="150" HorizontalAlignment="Left"
                         Command="{Binding SetInputFromHistoryButton}"
                         CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
-                    >Use History As Source</Button>
+                        >Use As Source</Button>
                         <Button Margin="5 5 0 0" MaxWidth="150" HorizontalAlignment="Left"
                         Command="{Binding SetTargetFromHistoryButton}"
                         CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
-                    >Use History As Target</Button>
+                        >Use As Target</Button>
                         <Button Margin="5 5 0 0" MaxWidth="150" 
                                 Command="{Binding ResetHistoryButton}"
-                                >Reset History</Button>
+                        >Reset History</Button>
+                        <Button Command="{Binding RemoveFromHistoryButton}"
+                                CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
+                                Margin="5 5 0 0 "
+                        >Remove</Button>
                     </StackPanel>
                 </StackPanel>
 
@@ -128,17 +132,24 @@
                             Margin="0 20 0 0">
                     <TextBlock FontWeight="Bold">List of source folders</TextBlock>
                     <!-- Show folders to search -->
-                    <ListView ItemsSource="{Binding SourceDirectories}"
+                    <ListView x:Name="SourceList"
+                              ItemsSource="{Binding SourceDirectories}"
                               DisplayMemberPath="DirectoryName"
                               SelectedItem="{Binding Path=SelectedInputSourceFolder}"
                               MinHeight="50">
                     </ListView>
+                    <Button Command="{Binding RemoveFromSourceListButton}"
+                            CommandParameter="{Binding ElementName=SourceList, Path=SelectedItem}"
+                            MaxWidth="100"
+                            HorizontalAlignment="Left"
+                            Margin="0 5 0 0"
+                            >Remove folder</Button>
                 </StackPanel>
             </StackPanel>
 
 
             <!-- Search / Cancel  / Reset-->
-            <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" Background="DimGray">
+            <StackPanel Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" Background="#FF646464">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Command="{Binding GoSearch}" 
                             Margin="0 0 10 0"
@@ -167,7 +178,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
             </Grid.RowDefinitions>
-            
+
             <!-- Found Files -->
             <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
 
@@ -216,15 +227,15 @@
 
                     <!-- Selected Files Handle -->
                     <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                        <Button Command="{Binding OpenFileButton}">Open File</Button>
-                        <TextBlock Margin="10 0 10 0" >Use Notepad++:</TextBlock>
-                        <CheckBox Margin="0 0 35 0" IsChecked="{Binding Path=SelectUseNPP, Mode=TwoWay}"/>
-                        <Button Command="{Binding Path=CopyAllButton}">Copy All</Button>
+                        <Button Command="{Binding OpenFileButton}" Content="Open File"/>
+                        <TextBlock Margin="10 0 10 0" ><Run Text="Use Notepad++:"/></TextBlock>
+                        <CheckBox Margin="0 0 35 0" 
+                                  IsChecked="{Binding SelectUseNPP, Mode=TwoWay}"
+                                  VerticalAlignment="Center"/>
+                        <Button Command="{Binding CopyAllButton}" Content="Copy All"/>
                         <Button Margin="10 0 0 0"
-                            Command="{Binding Path=CopySelectedButton}"
-                                CommandParameter="{Binding ElementName=FoundFiles, Path=SelectedItems}">
-                            Copy Selected
-                        </Button>
+                            Command="{Binding CopySelectedButton}"
+                                CommandParameter="{Binding SelectedItems, ElementName=FoundFiles}" Content="Copy Selected"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -235,16 +246,16 @@
                             Command="{Binding OpenExplorerForTargetButton}"
                                 CommandParameter="{Binding InputTargetFolder}">Open Folder</Button>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Background="#FF646464">
                         <TextBox Text="{Binding Path=InputTargetFolder}" MinWidth="200"/>
                         <Button Margin="5 0 0 0" MinWidth="30"
                             Command="{Binding OpenTargetFolderButton}">...</Button>
                     </StackPanel>
                 </StackPanel>
 
-            </StackPanel>         
+            </StackPanel>
 
         </Grid>
-        
+
     </Grid>
 </Window>
