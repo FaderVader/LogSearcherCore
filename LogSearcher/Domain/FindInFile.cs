@@ -37,7 +37,7 @@ namespace LogSearcher.Domain
 
                         if (fileContent.Contains(searchProfile.SearchString))
                         {
-                            // also locate the line and col of first occurence?                       
+                            // locate the line and col of first occurence                      
                             var hit = new HitFile(file);
                             hit.SearchPosition = await FindLine(fileContent);
                             HitList.Add(hit);

@@ -34,13 +34,13 @@ namespace LogSearcher.Domain
         
         public async Task TraverseSourceDirs()
         {
+            var pattern = $"{SearchProfile.FileExt}";                
+
             foreach (var directory in SourceDirectories)
             {
                 if (!Directory.Exists(directory.DirectoryName)) { continue; }
 
-                var pattern = $"{SearchProfile.FileExt}";                
                 var list = await GetFiles(directory.DirectoryName, pattern);
-
                 directory.FoundFileList.Clear(); // ensure list is cleared before populating
 
                 FindInFile findFile = new FindInFile(searchProfile);
@@ -51,13 +51,19 @@ namespace LogSearcher.Domain
 
         public List<HitFile> GetFoundFiles()
         {
-            List<HitFile> foundFiles = new List<HitFile>();
+            // // using simple foreach to iterate over nested collections:
 
-            foreach (var dir in SourceDirectories)
-            {
-                dir.FoundFileList.ForEach(foundFile => foundFiles.Add(foundFile));
-            }
+            //List<HitFile> foundFiles = new List<HitFile>();
+            //foreach (var dir in SourceDirectories)
+            //{
+            //    dir.FoundFileList.ForEach(foundFile => foundFiles.Add(foundFile));
+            //}
 
+
+
+            // replaced by LINQ:
+            
+            var foundFiles = SourceDirectories.SelectMany(dir => dir.FoundFileList).ToList();
             return foundFiles;
         }
 
@@ -65,8 +71,7 @@ namespace LogSearcher.Domain
         {
             List<string> list = new List<string>();
             try
-            {
-                //list = Directory.GetFiles(directory, searchPattern).ToList();
+            {               
                 list = await Task.Run(() => Directory.GetFiles(directory, searchPattern).ToList());
             }
             catch (Exception)

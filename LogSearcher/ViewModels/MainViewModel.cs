@@ -209,8 +209,8 @@ namespace LogSearcher.ViewModels
         {
             if (parameter == null) return;
             var dir = parameter as LogDirectory;
-            AcceptFolderToSources(dir.DirectoryName);
-            AcceptFolderToHistory(dir.DirectoryName);
+            AcceptFolderToSources(dir?.DirectoryName);
+            AcceptFolderToHistory(dir?.DirectoryName);
         }
         private void SetTargetFolder(object parameter)
         {
@@ -225,6 +225,7 @@ namespace LogSearcher.ViewModels
             // reset value of SourceFolderDisplay
             SourceDirectories = new ObservableCollection<SourceDirectory>();
             HitList = new ObservableCollection<HitFile>();
+            SearchStatus = "";
         }
         private void OpenTargetFolder()
         {
@@ -244,7 +245,7 @@ namespace LogSearcher.ViewModels
                 SearchStatus = "No files found!";
                 return;
             }
-            SearchStatus = "Found Files:";
+            SearchStatus = $"Found Files: {HitList.Count}";
             await persistHistory.SaveHistory(DirectoryHistory);
         }
         private async void CopyAllFiles()
@@ -267,8 +268,7 @@ namespace LogSearcher.ViewModels
         }
         private void OpenFile()
         {
-            var useNPP = SelectUseNPP;
-            if (useNPP)
+            if (SelectUseNPP)
             {
                 FileHandler.OpenWithNPP(SelectedFile);
                 return;
@@ -363,12 +363,7 @@ namespace LogSearcher.ViewModels
 
         private void UpdateHitList()
         {
-            var temp = new ObservableCollection<HitFile>();
-
-            foreach (var hit in HitList)
-            {
-                temp.Add(hit);
-            }
+            ObservableCollection<HitFile> temp = new ObservableCollection<HitFile>(HitList.Select(hit => hit));
 
             HitList.Clear();
             HitList = temp;
