@@ -12,7 +12,6 @@ namespace LogSearcher.Utils
 {
     public class PersistHistory
     {
-        //string path = @"C:\temp\settings\history.json";
         public string FilePath { get; set; }
         private string fileName = "history.json";
 
@@ -40,7 +39,6 @@ namespace LogSearcher.Utils
 
         public async Task<IEnumerable<LogDirectory>> GetHistory()
         {
-            //string json = File.ReadAllText(path);
             string json;
             using (StreamReader sourceStream = File.OpenText(Path.Combine(FilePath, fileName)))
             {

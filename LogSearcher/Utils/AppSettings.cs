@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
+using System.Windows;
 
 namespace LogSearcher.Utils
 {
@@ -9,14 +11,27 @@ namespace LogSearcher.Utils
 
         static AppSettings()
         {
-            var builder = new ConfigurationBuilder()
-                              .SetBasePath(Directory.GetCurrentDirectory())
-                              .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            try
+            {
+                var builder = new ConfigurationBuilder()
+                          .SetBasePath(Directory.GetCurrentDirectory())
+                          .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            configRoot = builder.Build();
-            var appSettings = configRoot.GetSection("AppSettings");
-            
-            
+                configRoot = builder.Build();
+                var appSettings = configRoot.GetSection("AppSettings");
+            }
+            catch (Exception)
+            {
+                MessageBox.Show($"Failed to find settings.{Environment.NewLine}The application will exit.", "LogSearcher Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                
+                // workaround for false-flagging settings as missing when editing MainWindow.xaml
+                var application = Application.Current;                
+                if (application.MainWindow != null)
+                {
+                    Environment.Exit(1);
+                }
+
+            }
         }
 
         public static Settings GetSettings()

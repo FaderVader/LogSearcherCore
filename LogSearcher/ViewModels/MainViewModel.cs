@@ -34,7 +34,6 @@ namespace LogSearcher.ViewModels
 
             // wire-up buttons
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);
-            CancelSearchButton = new RelayCommandNoParams(CancelSearch);
             ResetHistoryButton = new RelayCommandNoParams(ResetHistory);
             OpenSourceFolderButton = new RelayCommandNoParams(BrowseForSourceFolder);
             OpenTargetFolderButton = new RelayCommandNoParams(OpenTargetFolder);
@@ -42,6 +41,7 @@ namespace LogSearcher.ViewModels
 
             GoSearch = new RelayCommandNoParams(StartSearch, () => SourceDirectories.Count > 0);
             OpenFileButton = new RelayCommandNoParams(OpenFile, () => SelectedFile != null);
+            CancelSearchButton = new RelayCommandNoParams(CancelSearch, () => SearchIsRunning == true);
             SubmitSourceFolderButton = new RelayCommandNoParams(SubmitSourceFolder, () => InputSourceFolder.ValidateDirectory()); 
             SetInputFromHistoryButton = new RelayCommandWithParams(SetSourceFolder, () => SelectedHistoryFolder != null);
             SetTargetFromHistoryButton = new RelayCommandWithParams(SetTargetFolder, () => SelectedHistoryFolder != null);
@@ -79,14 +79,21 @@ namespace LogSearcher.ViewModels
         #region Main lists
 
         private Settings settings;
+        private bool searchIsRunning;
         private PersistHistory persistHistory;
 
-        private ObservableCollection<SourceDirectory> sourceDirectories;
         private TargetDirectory targetDirectory;
         private ObservableCollection<HitFile> hitList;
         private BindingList<LogDirectory> directoryHistory;
+        private ObservableCollection<SourceDirectory> sourceDirectories;
 
         CancellationTokenSource cancel;
+        
+        public bool SearchIsRunning
+        {
+            get { return searchIsRunning; }
+            set { OnPropertyChanged(ref searchIsRunning, value); }
+        }
 
         public ObservableCollection<SourceDirectory> SourceDirectories
         {
@@ -241,6 +248,8 @@ namespace LogSearcher.ViewModels
         }
         private async void StartSearch()
         {
+            SearchIsRunning = true;
+
             try
             {
                 SearchStatus = "Searching...";
@@ -252,12 +261,17 @@ namespace LogSearcher.ViewModels
                     SearchStatus = "No files found!";
                     return;
                 }
+
                 SearchStatus = $"Found Files: {HitList.Count}";
                 await persistHistory.SaveHistory(DirectoryHistory);
             }
             catch (TaskCanceledException)
             {
                 SearchStatus = "Cancelled Search!";
+            }
+            finally
+            {
+                SearchIsRunning = false;
             }
         }
         private async void CopyAllFiles()

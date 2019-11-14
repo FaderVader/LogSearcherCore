@@ -82,20 +82,21 @@
             <StackPanel Grid.Row="2" Grid.Column="1" 
                         Margin="0 20 0 0"                         
                         Orientation="Vertical">
-                <!-- Heading & Add button-->
+                <!-- Heading & Add button & ... button-->
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontWeight="Bold">Source folder:</TextBlock>
                     <Button Margin="5 0 0 0" MinWidth="30"
-                        Command="{Binding OpenSourceFolderButton}">...</Button>
+                        Command="{Binding OpenSourceFolderButton}"
+                        >...</Button>
                     <Button Margin="5 0 0 0"                           
-                        Command="{Binding SubmitSourceFolderButton}">Add</Button>
+                        Command="{Binding SubmitSourceFolderButton}"
+                        >Add</Button>
                 </StackPanel>
 
-                <!-- InputString & ... button -->
+                <!-- InputString  -->
                 <StackPanel Orientation="Horizontal">
                     <TextBox Text="{Binding Path=InputSourceFolder, Mode=TwoWay}"
                              MinWidth="200"/>
-
                 </StackPanel>
 
                 <!-- HistoryDrop & UseHist button-->
@@ -111,18 +112,19 @@
                     <StackPanel Orientation="Horizontal">
                         <Button Margin="0 5 0 0" MaxWidth="150" HorizontalAlignment="Left"
                         Command="{Binding SetInputFromHistoryButton}"
-                        CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
+                        CommandParameter="{Binding ElementName=History, Path=SelectedItem}" Background="#FF849940"
                         >Use As Source</Button>
                         <Button Margin="5 5 0 0" MaxWidth="150" HorizontalAlignment="Left"
                         Command="{Binding SetTargetFromHistoryButton}"
-                        CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
+                        CommandParameter="{Binding ElementName=History, Path=SelectedItem}" Background="#FF91A0FF"
                         >Use As Target</Button>
                         <Button Margin="5 5 0 0" MaxWidth="150" 
-                                Command="{Binding ResetHistoryButton}"
+                                Command="{Binding ResetHistoryButton}" Background="#FFFFF9D1"
                         >Reset History</Button>
                         <Button Command="{Binding RemoveFromHistoryButton}"
                                 CommandParameter="{Binding ElementName=History, Path=SelectedItem}"
                                 Margin="5 5 0 0 "
+                                Background="#FF93AACC"
                         >Remove</Button>
                     </StackPanel>
                 </StackPanel>
@@ -136,10 +138,11 @@
                               ItemsSource="{Binding SourceDirectories}"
                               DisplayMemberPath="DirectoryName"
                               SelectedItem="{Binding Path=SelectedInputSourceFolder}"
-                              MinHeight="50">
+                              MinHeight="50" Background="#FF849940">
                     </ListView>
                     <Button Command="{Binding RemoveFromSourceListButton}"
                             CommandParameter="{Binding ElementName=SourceList, Path=SelectedItem}"
+                            Background="#FF93AACC"
                             MaxWidth="100"
                             HorizontalAlignment="Left"
                             Margin="0 5 0 0"
@@ -153,13 +156,15 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Command="{Binding GoSearch}" 
                             Margin="0 0 10 0"
-                            Background="LightGreen">SEARCH</Button>
-                    <Button Command="{Binding ResetSourceFolderDisplayButton}">
-                        Reset
-                    </Button>
+                            MinWidth="120"
+                            Background="#FF849940"
+                            >SEARCH</Button>
                     <Button Command="{Binding CancelSearchButton}"
-                            Margin="10 0 0 0"
-                            >Cancel</Button>
+                            Margin="0 0 10 0"
+                            Background="#FF93AACC"
+                            >Cancel</Button>                    
+                    <Button Command="{Binding ResetSourceFolderDisplayButton}" Background="#FFFFF9D1"
+                            >Reset</Button>                    
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -189,13 +194,13 @@
                 <StackPanel Orientation="Vertical">
                     <TextBlock FontWeight="Bold" Text="{Binding SearchStatus}"/>
                     <ListView x:Name="FoundFiles"
-                  ItemsSource="{Binding HitList}"                   
-                  ItemContainerStyle="{StaticResource ListViewItems}"
-                  ItemTemplate="{StaticResource FoundFilesView}"
-                  MinHeight="100"
-                  MaxHeight="500"
-                  SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
-                  SelectionMode="Extended">
+                        ItemsSource="{Binding HitList}"                   
+                        ItemContainerStyle="{StaticResource ListViewItems}"
+                        ItemTemplate="{StaticResource FoundFilesView}"
+                        MinHeight="100"
+                        MaxHeight="500"
+                        SelectedItem="{Binding Path=SelectedFile, Mode=TwoWay}"
+                        SelectionMode="Extended">
                     </ListView>
                 </StackPanel>
             </StackPanel>
@@ -218,10 +223,10 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontWeight="Bold">Path of selected file:</TextBlock>
                             <Button Margin="10 0 0 5"
-                                Command="{Binding OpenExplorerButton}"
-                                    CommandParameter="{Binding SelectedFile.FilePath}">
-                                Open Folder
-                            </Button>
+                                    Command="{Binding OpenExplorerButton}"
+                                    CommandParameter="{Binding SelectedFile.FilePath}"
+                                    Background="#FF849940"
+                            >Open Folder</Button>
                         </StackPanel>
                         <StackPanel>
                             <TextBox Text="{Binding SelectedFile.FilePath, Mode=OneWay}"/>
@@ -230,14 +235,16 @@
 
                     <!-- Selected Files Handle -->
                     <StackPanel Orientation="Horizontal" Margin="0 20 0 0">
-                        <Button Command="{Binding OpenFileButton}" Content="Open File"/>
+                        <Button Background="#FF849940"
+                                Command="{Binding OpenFileButton}" 
+                                Content="Open File"/>
                         <TextBlock Margin="10 0 10 0" ><Run Text="Use Notepad++:"/></TextBlock>
                         <CheckBox Margin="0 0 35 0" 
                                   IsChecked="{Binding SelectUseNPP, Mode=TwoWay}"
                                   VerticalAlignment="Center"/>
                         <Button Command="{Binding CopyAllButton}" Content="Copy All"/>
                         <Button Margin="10 0 0 0"
-                            Command="{Binding CopySelectedButton}"
+                                Command="{Binding CopySelectedButton}"
                                 CommandParameter="{Binding SelectedItems, ElementName=FoundFiles}" Content="Copy Selected"/>
                     </StackPanel>
                 </StackPanel>
@@ -246,13 +253,16 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontWeight="Bold">Target folder:</TextBlock>
                         <Button Margin="5 0 0 5"
-                            Command="{Binding OpenExplorerForTargetButton}"
-                                CommandParameter="{Binding InputTargetFolder}">Open Folder</Button>
+                                Background="#FF849940"
+                                Command="{Binding OpenExplorerForTargetButton}"
+                                CommandParameter="{Binding InputTargetFolder}"
+                                >Open Folder</Button>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Background="#FF646464">
-                        <TextBox Text="{Binding Path=InputTargetFolder}" MinWidth="200"/>
+                        <TextBox Text="{Binding Path=InputTargetFolder}" MinWidth="200" Background="#FF91A0FF"/>
                         <Button Margin="5 0 0 0" MinWidth="30"
-                            Command="{Binding OpenTargetFolderButton}">...</Button>
+                                Command="{Binding OpenTargetFolderButton}"
+                                >...</Button>
                     </StackPanel>
                 </StackPanel>
 
