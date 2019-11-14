@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LogSearcher.Domain
@@ -32,19 +33,31 @@ namespace LogSearcher.Domain
         }
 
         
-        public async Task TraverseSourceDirs()
+        public async Task TraverseSourceDirs(CancellationToken cancel)
         {
-            var pattern = $"{SearchProfile.FileExt}";                
+            var pattern = $"{SearchProfile.FileExt}";     
+            
+            // wrap all in try/catch - check if TaskCancelledException was thrown
 
             foreach (var directory in SourceDirectories)
             {
                 if (!Directory.Exists(directory.DirectoryName)) { continue; }
 
                 var list = await GetFiles(directory.DirectoryName, pattern);
+
+                // check if cancellation is requested 
+                if (cancel.IsCancellationRequested)
+                {
+                    throw new TaskCanceledException();
+                }
+
                 directory.FoundFileList.Clear(); // ensure list is cleared before populating
 
                 FindInFile findFile = new FindInFile(searchProfile);
-                await findFile.SearchInList(list);          
+
+                // pass the cancellation-token on to .SearchInList()
+                await findFile.SearchInList(list, cancel);    
+                
                 directory.FoundFileList = findFile.HitList;
             }
         }
@@ -62,7 +75,7 @@ namespace LogSearcher.Domain
 
 
             // replaced by LINQ:
-            
+
             var foundFiles = SourceDirectories.SelectMany(dir => dir.FoundFileList).ToList();
             return foundFiles;
         }

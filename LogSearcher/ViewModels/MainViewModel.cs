@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LogSearcher.ViewModels
@@ -33,6 +34,7 @@ namespace LogSearcher.ViewModels
 
             // wire-up buttons
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);
+            CancelSearchButton = new RelayCommandNoParams(CancelSearch);
             ResetHistoryButton = new RelayCommandNoParams(ResetHistory);
             OpenSourceFolderButton = new RelayCommandNoParams(BrowseForSourceFolder);
             OpenTargetFolderButton = new RelayCommandNoParams(OpenTargetFolder);
@@ -51,6 +53,8 @@ namespace LogSearcher.ViewModels
             RemoveFromSourceListButton = new RelayCommandWithParams(RemoveFromSourceList, () => SelectedInputSourceFolder != null);
 
             InitializeHistory();
+
+            //cancel = new CancellationTokenSource();
         }
 
 
@@ -70,6 +74,7 @@ namespace LogSearcher.ViewModels
         public RelayCommandWithParams OpenExplorerForTargetButton { get; }
         public RelayCommandWithParams RemoveFromSourceListButton { get;}
         public RelayCommandWithParams RemoveFromHistoryButton { get; }
+        public RelayCommandNoParams CancelSearchButton { get; }
 
         #endregion
 
@@ -82,6 +87,7 @@ namespace LogSearcher.ViewModels
         private TargetDirectory targetDirectory;
         private ObservableCollection<HitFile> hitList;
         private BindingList<LogDirectory> directoryHistory;
+        CancellationTokenSource cancel;
 
         public ObservableCollection<SourceDirectory> SourceDirectories
         {
@@ -236,17 +242,24 @@ namespace LogSearcher.ViewModels
         }
         private async void StartSearch()
         {
-            SearchStatus = "Searching...";
-            HitList.Clear();
-            await SearchForFiles();
-
-            if (HitList.Count < 1)
+            try
             {
-                SearchStatus = "No files found!";
-                return;
+                SearchStatus = "Searching...";
+                HitList.Clear();
+                await SearchForFiles();
+
+                if (HitList.Count < 1)
+                {
+                    SearchStatus = "No files found!";
+                    return;
+                }
+                SearchStatus = $"Found Files: {HitList.Count}";
+                await persistHistory.SaveHistory(DirectoryHistory);
             }
-            SearchStatus = $"Found Files: {HitList.Count}";
-            await persistHistory.SaveHistory(DirectoryHistory);
+            catch (TaskCanceledException)
+            {
+                SearchStatus = "Cancelled Search!";
+            }
         }
         private async void CopyAllFiles()
         {
@@ -292,6 +305,10 @@ namespace LogSearcher.ViewModels
             var directory = parameter as LogDirectory;
             DirectoryHistory.Remove(directory);
         }
+        private void CancelSearch()
+        {
+            cancel.Cancel();
+        }
         #endregion
 
         #region Button-toggles
@@ -317,9 +334,12 @@ namespace LogSearcher.ViewModels
         #region Methods
         private async Task SearchForFiles()
         {
+            // create new instance of Cancel-token for each search
+            cancel = new CancellationTokenSource();
+
             SearchProfile profile = new SearchProfile(InputSearchString, InputExtension);
             FileGatherer gatherer = new FileGatherer(SourceDirectories, profile);
-            await gatherer.TraverseSourceDirs();
+            await gatherer.TraverseSourceDirs(cancel.Token);
             var result = gatherer.GetFoundFiles();
 
             ObservableCollection<HitFile> localHits = new ObservableCollection<HitFile>();

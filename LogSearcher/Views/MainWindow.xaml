@@ -157,6 +157,9 @@
                     <Button Command="{Binding ResetSourceFolderDisplayButton}">
                         Reset
                     </Button>
+                    <Button Command="{Binding CancelSearchButton}"
+                            Margin="10 0 0 0"
+                            >Cancel</Button>
                 </StackPanel>
             </StackPanel>
         </Grid>

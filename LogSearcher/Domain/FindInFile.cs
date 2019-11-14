@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using static LogSearcher.Domain.Validate;
 
 namespace LogSearcher.Domain
@@ -25,12 +27,18 @@ namespace LogSearcher.Domain
             HitList = new List<HitFile>();
         }
 
-        public async Task SearchInList(List<string> list)
+        public async Task SearchInList(List<string> list, CancellationToken cancel)
         {
             foreach (var file in list)
             {
                 try
                 {
+                    // check if cancellation is requested 
+                    if (cancel.IsCancellationRequested)
+                    {
+                        throw new TaskCanceledException();
+                    }
+
                     using (var reader = File.OpenText(file))
                     {
                         var fileContent = await reader.ReadToEndAsync();
@@ -43,6 +51,11 @@ namespace LogSearcher.Domain
                             HitList.Add(hit);
                         }
                     }
+                }
+                catch (TaskCanceledException e)
+                {
+                    MessageBox.Show("User Cancelled Search!");
+                    return;
                 }
                 catch (Exception e)
                 {
