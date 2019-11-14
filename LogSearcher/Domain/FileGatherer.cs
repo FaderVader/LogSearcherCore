@@ -37,7 +37,8 @@ namespace LogSearcher.Domain
         {
             var pattern = $"{SearchProfile.FileExt}";     
             
-            // wrap all in try/catch - check if TaskCancelledException was thrown
+            // no need to wrap all in try/catch :
+            // TaskCancelledException is propagated to caller
 
             foreach (var directory in SourceDirectories)
             {
@@ -52,12 +53,9 @@ namespace LogSearcher.Domain
                 }
 
                 directory.FoundFileList.Clear(); // ensure list is cleared before populating
+                FindInFile findFile = new FindInFile(searchProfile);    
+                await findFile.SearchInList(list, cancel);  // pass the cancellation-token on to .SearchInList()
 
-                FindInFile findFile = new FindInFile(searchProfile);
-
-                // pass the cancellation-token on to .SearchInList()
-                await findFile.SearchInList(list, cancel);    
-                
                 directory.FoundFileList = findFile.HitList;
             }
         }

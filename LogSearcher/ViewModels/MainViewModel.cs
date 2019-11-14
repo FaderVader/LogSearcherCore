@@ -52,9 +52,7 @@ namespace LogSearcher.ViewModels
             RemoveFromHistoryButton = new RelayCommandWithParams(RemoveFromHistory, () => SelectedHistoryFolder != null);
             RemoveFromSourceListButton = new RelayCommandWithParams(RemoveFromSourceList, () => SelectedInputSourceFolder != null);
 
-            InitializeHistory();
-
-            //cancel = new CancellationTokenSource();
+            InitializeHistory();            
         }
 
 
@@ -87,6 +85,7 @@ namespace LogSearcher.ViewModels
         private TargetDirectory targetDirectory;
         private ObservableCollection<HitFile> hitList;
         private BindingList<LogDirectory> directoryHistory;
+
         CancellationTokenSource cancel;
 
         public ObservableCollection<SourceDirectory> SourceDirectories
