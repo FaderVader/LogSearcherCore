@@ -62,18 +62,6 @@ namespace LogSearcher.Domain
 
         public List<HitFile> GetFoundFiles()
         {
-            // // using simple foreach to iterate over nested collections:
-
-            //List<HitFile> foundFiles = new List<HitFile>();
-            //foreach (var dir in SourceDirectories)
-            //{
-            //    dir.FoundFileList.ForEach(foundFile => foundFiles.Add(foundFile));
-            //}
-
-
-
-            // replaced by LINQ:
-
             var foundFiles = SourceDirectories.SelectMany(dir => dir.FoundFileList).ToList();
             return foundFiles;
         }

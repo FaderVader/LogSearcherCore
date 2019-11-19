@@ -214,7 +214,9 @@
                     <!-- 1st found line-->
                     <StackPanel Orientation="Vertical">
                         <TextBlock FontWeight="Bold">1st found line:</TextBlock>
-                        <TextBox Text="{Binding FileContent}" TextWrapping="Wrap">
+                        <TextBox Text="{Binding FileContent}" 
+                                 TextWrapping="Wrap"
+                                 MaxHeight="50">
                         </TextBox>
                     </StackPanel>
 

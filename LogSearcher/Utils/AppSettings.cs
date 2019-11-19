@@ -22,11 +22,10 @@ namespace LogSearcher.Utils
             }
             catch (Exception)
             {
-                MessageBox.Show($"Failed to find settings.{Environment.NewLine}The application will exit.", "LogSearcher Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Failed to find settings.{Environment.NewLine}The application will exit.", "LogSearcher Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);                
                 
-                // workaround for false-flagging settings as missing when editing MainWindow.xaml
                 var application = Application.Current;                
-                if (application.MainWindow != null)
+                if (application.MainWindow != null)  // workaround for false-flagging settings as missing when editing MainWindow.xaml
                 {
                     Environment.Exit(1);
                 }

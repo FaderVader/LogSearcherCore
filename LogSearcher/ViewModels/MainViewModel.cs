@@ -216,6 +216,9 @@ namespace LogSearcher.ViewModels
         private void SubmitSourceFolder()
         {
             AcceptFolderToSources(InputSourceFolder);
+            AcceptFolderToHistory(InputSourceFolder);
+
+            InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
         }
         private void SetSourceFolder(object parameter)
         {
@@ -371,8 +374,8 @@ namespace LogSearcher.ViewModels
             // first, get selected files
             if (elements != null)
             {                        
-                var objList = (IEnumerable<object>)elements; // First, get a collection from the argument
-                selectedFiles = new ObservableCollection<HitFile>(objList.Select(item => item).Cast<HitFile>()); // then, use LINQ to cast to generic ObsCol
+                var objList = (IEnumerable<object>)elements; // cast the argument to a collection
+                selectedFiles = new ObservableCollection<HitFile>(objList.Select(item => item).Cast<HitFile>()); // use LINQ to cast to type, and add to generic ObsCol
             }
 
             // then, get marked files
@@ -404,9 +407,8 @@ namespace LogSearcher.ViewModels
             {
                 SourceDirectory sourceDir = new SourceDirectory(folder);
                 var sourceExists = SourceDirectories.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();  
-                if (sourceExists == null) SourceDirectories.Add(sourceDir);  //ensure duplicate entries are not allowed                
-
-                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
+                
+                if (sourceExists == null) SourceDirectories.Add(sourceDir);  //ensure duplicate entries are not allowed     
             }
         }
 
@@ -416,6 +418,7 @@ namespace LogSearcher.ViewModels
             {
                 TargetDirectory newDir = new TargetDirectory(folder);
                 var historyExists = DirectoryHistory.Where(item => item.DirectoryName == newDir.DirectoryName).FirstOrDefault();
+
                 if (historyExists == null) DirectoryHistory.Add(newDir);
             }
         }
