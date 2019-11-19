@@ -203,12 +203,15 @@ namespace LogSearcher.ViewModels
         {
             var target = InputSourceFolder.ValidateDirectory() == true ? InputSourceFolder : "";
             var folder = FileHandler.BrowseForFolder(target);
-            AcceptFolderToSources(folder);
             AcceptFolderToHistory(folder);
+            AcceptFolderToSources(folder);
         }
         private void SubmitSourceFolder()
         {
+            AcceptFolderToHistory(InputSourceFolder);
             AcceptFolderToSources(InputSourceFolder);
+
+            InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
         }
         private void SetSourceFolder(object parameter)
         {
@@ -394,9 +397,7 @@ namespace LogSearcher.ViewModels
             {
                 SourceDirectory sourceDir = new SourceDirectory(folder);
                 var sourceExists = SourceDirectories.Where(item => item.DirectoryName == sourceDir.DirectoryName).FirstOrDefault();  
-                if (sourceExists == null) SourceDirectories.Add(sourceDir);  //ensure duplicate entries are not allowed                
-
-                InputSourceFolder = "";  // ensure input-field is cleared, to signal input accepted
+                if (sourceExists == null) SourceDirectories.Add(sourceDir);  //ensure duplicate entries are not allowed      
             }
         }
 
