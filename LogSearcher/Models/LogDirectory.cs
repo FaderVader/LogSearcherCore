@@ -10,10 +10,12 @@ namespace LogSearcher.Models
 
         public LogDirectory(string path)
         {
+            if (!path.ValidateDirectory())
+            {
+                throw new FileNotFoundException("The directory is not valid");
+            }
             this.directory = path;
             this.dirInfo = path.GetDirInfo();
-
-
         }
 
         public string DirectoryName

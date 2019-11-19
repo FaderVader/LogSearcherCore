@@ -370,13 +370,9 @@ namespace LogSearcher.ViewModels
 
             // first, get selected files
             if (elements != null)
-            {
-                //TODO: there must be a LINQ expression like js objList.map(x => selectedFiles.Add(x as HitFile)) ??
-                var objList = (IEnumerable<object>)elements;
-                foreach (var obj in objList)
-                {
-                    selectedFiles.Add(obj as HitFile);
-                }
+            {                        
+                var objList = (IEnumerable<object>)elements; // First, get a collection from the argument
+                selectedFiles = new ObservableCollection<HitFile>(objList.Select(item => item).Cast<HitFile>()); // then, use LINQ to cast to generic ObsCol
             }
 
             // then, get marked files
