@@ -1,21 +1,31 @@
-﻿using LogSearcher.Domain;
-using LogSearcher.Utils;
-using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using static LogSearcher.Domain.Validate;
+﻿using System;
 
 namespace LogSearcher.Models
 {
     public class HitFile : IFoundFile 
     {
+        public HitFile(string fullPath)
+        {           
+            if (fullPath.Length < 1) throw new Exception("path is too short");
+
+            if (!fullPath.Contains("\\")) throw new Exception("path seems illegit");
+
+            // if last char is \ remove
+            if (fullPath.EndsWith("\\")) { fullPath = fullPath.Substring(0, fullPath.Length - 1); };
+
+            int lastDelim = fullPath.LastIndexOf('\\');
+
+            fileName = fullPath.Substring(lastDelim + 1);
+            filePath = fullPath.Substring(0, lastDelim);
+
+        }
+        
         private string fileName;
         public string FileName
         {
             get { return fileName; }
         }
-
-
+        
         private string filePath;
         public string FilePath
         {
@@ -48,25 +58,5 @@ namespace LogSearcher.Models
             get { return searchPosition; }
             set { searchPosition = value; }
         }
-
-        public HitFile(string fullPath)
-        {
-            // should we extract this to a method/extension?
-            if (fullPath.Length < 1) throw new Exception("path is too short");
-
-            if (!fullPath.Contains("\\")) throw new Exception("path seems illegit");
-
-            // if last char is \ remove
-            if (fullPath.EndsWith("\\")) { fullPath = fullPath.Substring(0, fullPath.Length - 1); };
-
-            int lastDelim = fullPath.LastIndexOf('\\');
-
-            fileName = fullPath.Substring(lastDelim + 1);
-            filePath = fullPath.Substring(0, lastDelim);
-
-        }
-
-
-
     }
 }

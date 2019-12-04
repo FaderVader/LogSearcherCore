@@ -29,8 +29,8 @@ namespace LogSearcher.ViewModels
 
             // get settings
             settings = AppSettings.GetSettings();
-            persistHistory = new PersistHistory(settings.HistoryPath);
             SelectUseNPP = settings.UseNPP;
+            persistHistory = new PersistHistory(settings.HistoryPath);
 
             // wire-up buttons
             CopyAllButton = new RelayCommandNoParams(CopyAllFiles, EnableCopyAll);
@@ -291,7 +291,7 @@ namespace LogSearcher.ViewModels
         {
             if (path != null && (path as string).ValidateDirectory())
             {
-                LogDirectory directory = new SourceDirectory(path as string);
+                LogDirectory directory = new SourceDirectory(path as string); //TODO: LogDirectory -> SourceDirectory
                 await FileHandler.OpenExplorer(directory);
             }
         }
@@ -433,7 +433,7 @@ namespace LogSearcher.ViewModels
 
                 DirectoryHistory = history;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // if failed to read, we just ignore error and continue
             }

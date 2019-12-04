@@ -5,9 +5,6 @@ namespace LogSearcher.Models
 {
     public abstract class LogDirectory
     {
-        private string directory;
-        private DirectoryInfo dirInfo;
-
         public LogDirectory(string path)
         {
             if (!path.ValidateDirectory())
@@ -17,6 +14,9 @@ namespace LogSearcher.Models
             this.directory = path;
             this.dirInfo = path.GetDirInfo();
         }
+
+        private string directory;
+        private DirectoryInfo dirInfo;
 
         public string DirectoryName
         {
