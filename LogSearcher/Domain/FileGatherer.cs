@@ -35,8 +35,6 @@ namespace LogSearcher.Domain
         
         public async Task TraverseSourceDirs(CancellationToken cancel)
         {
-            var pattern = $"{SearchProfile.FileExt}";     
-            
             // no need to wrap all in try/catch :
             // TaskCancelledException is propagated to caller
 
@@ -44,7 +42,7 @@ namespace LogSearcher.Domain
             {
                 if (!Directory.Exists(directory.DirectoryName)) { continue; }
 
-                var list = await GetFiles(directory.DirectoryName, pattern);
+                var list = await GetFiles(directory.DirectoryName);  
 
                 // check if cancellation is requested 
                 if (cancel.IsCancellationRequested)
@@ -66,8 +64,9 @@ namespace LogSearcher.Domain
             return foundFiles;
         }
 
-        private async Task<List<string>> GetFiles(string directory, string searchPattern)
+        private async Task<List<string>> GetFiles(string directory)  
         {
+            var searchPattern = $"{SearchProfile.FileExt}";
             List<string> list = new List<string>();
             try
             {               

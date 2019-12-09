@@ -1,11 +1,9 @@
 ﻿using LogSearcher.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
 using System.IO;
 using System.Linq;
-using System.ComponentModel;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
